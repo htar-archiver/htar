@@ -4,11 +4,13 @@ import (
   "bytes"
   "testing"
   "github.com/stretchr/testify/assert"
+
+  "htar/pkg/testdata"
 )
 
 func TestVerifyPartition(t *testing.T) {
-  fs := singleFileFs("test.txt", "test")
-  part := singleFilePart("test.txt", len([]byte("test")))
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   buf := new(bytes.Buffer)
 
   err := WritePartition(fs, part, buf, nil)
@@ -30,8 +32,8 @@ func TestVerifyPartition(t *testing.T) {
 }
 
 func TestVerifyPartitionFailure(t *testing.T) {
-  fs := singleFileFs("corrupted.txt", "<--Content#1-->")
-  part := singleFilePart("corrupted.txt", len([]byte("<--Content#1-->")))
+  fs := testdata.SingleFileFs("corrupted.txt", "<--Content#1-->")
+  part := testdata.SingleFilePart("corrupted.txt", len([]byte("<--Content#1-->")))
 
   buf := new(bytes.Buffer)
   WritePartition(fs, part, buf, nil)

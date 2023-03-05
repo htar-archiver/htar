@@ -1,10 +1,11 @@
 package cli
 
 import (
-  "io"
-  "os"
+  "errors"
   "fmt"
+  "io"
   "io/fs"
+  "os"
   "strings"
   "sync"
   "path"
@@ -71,4 +72,9 @@ func (a *FileArchiver) getName(partIndex int) string {
   ext := path.Ext(file)
   base := strings.TrimSuffix(file, ext)
   return path.Join(dir, fmt.Sprintf("%v_part%d%v", base, partIndex, ext))
+}
+
+func pathExists(path string) bool {
+  _, err := os.Stat(path)
+  return !errors.Is(err, os.ErrNotExist)
 }

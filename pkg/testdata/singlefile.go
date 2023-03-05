@@ -1,11 +1,11 @@
-package archive
+package testdata
 
 import (
   "testing/fstest"
   . "htar/pkg/core"
 )
 
-func singleFileFs(path string, data string) fstest.MapFS {
+func SingleFileFs(path string, data string) fstest.MapFS {
   return fstest.MapFS{ 
     path: &fstest.MapFile{
       Mode: 0666,
@@ -14,7 +14,7 @@ func singleFileFs(path string, data string) fstest.MapFS {
   }
 }
 
-func singleFilePart(path string, size int) Partition {
+func SingleFilePart(path string, size int) Partition {
   return Partition {
     TotalFiles: 1,
     TotalSize: int64(size),

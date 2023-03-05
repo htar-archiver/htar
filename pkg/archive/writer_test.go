@@ -5,11 +5,13 @@ import (
   "fmt"
   "testing"
   "github.com/stretchr/testify/assert"
+
+  "htar/pkg/testdata"
 )
 
 func TestWriteTarWithoutError(t *testing.T) {
-  fs := singleFileFs("test.txt", "test")
-  part := singleFilePart("test.txt", len([]byte("test")))
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   buf := new(bytes.Buffer)
 
   err := WritePartition(fs, part, buf, nil)
@@ -19,8 +21,8 @@ func TestWriteTarWithoutError(t *testing.T) {
 }
 
 func TestWriteTarFileNotFound(t *testing.T) {
-  fs := singleFileFs("a.txt", "a")
-  part := singleFilePart("b.txt", len([]byte("a")))
+  fs := testdata.SingleFileFs("a.txt", "a")
+  part := testdata.SingleFilePart("b.txt", len([]byte("a")))
   buf := new(bytes.Buffer)
 
   err := WritePartition(fs, part, buf, nil)
@@ -30,8 +32,8 @@ func TestWriteTarFileNotFound(t *testing.T) {
 }
 
 func TestWriteTarProgress(t *testing.T) {
-  fs := singleFileFs("test.txt", "test")
-  part := singleFilePart("test.txt", len([]byte("test")))
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   buf := new(bytes.Buffer)
 
   pgc := make(chan ProgressUpdate)
@@ -48,8 +50,8 @@ func TestWriteTarProgress(t *testing.T) {
 }
 
 func TestHashOfHashes(t *testing.T) {
-  fs := singleFileFs("test.txt", "test")
-  part := singleFilePart("test.txt", len([]byte("test")))
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   buf := new(bytes.Buffer)
 
   pgc := make(chan ProgressUpdate)
@@ -65,8 +67,8 @@ func TestHashOfHashes(t *testing.T) {
 }
 
 func TestWriteTarGrownFile(t *testing.T) {
-  fs := singleFileFs("test.txt", "resized")
-  part := singleFilePart("test.txt", len([]byte("test")))
+  fs := testdata.SingleFileFs("test.txt", "resized")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   buf := new(bytes.Buffer)
 
   pgc := make(chan ProgressUpdate)
@@ -83,8 +85,8 @@ func TestWriteTarGrownFile(t *testing.T) {
 }
 
 func TestWriteTarShrinkedFile(t *testing.T) {
-  fs := singleFileFs("test.txt", "test")
-  part := singleFilePart("test.txt", len([]byte("shrinked")))
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("shrinked")))
   buf := new(bytes.Buffer)
 
   pgc := make(chan ProgressUpdate)

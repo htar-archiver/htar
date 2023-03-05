@@ -4,10 +4,16 @@ import (
   "io"
   "os/exec"
   "sync"
+  "syscall"
 )
 
 func Run(cmd *exec.Cmd, stdin io.Reader, outlines chan<- string) error {
   defer close(outlines)
+
+  cmd.SysProcAttr = &syscall.SysProcAttr{
+    // Detach controlling terminal
+    Setsid: true,
+  }
 
   stdout, err := cmd.StdoutPipe()
   if err != nil {

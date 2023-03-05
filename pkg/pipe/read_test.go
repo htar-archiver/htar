@@ -54,4 +54,3 @@ func TestMixed(t *testing.T) {
   scanner.Scan()
   assert.Equal(t, "\rBye\n", scanner.Text())
 }
-

@@ -16,7 +16,7 @@ type Scanner struct {
   size int64
 }
 
-func (sc *Scanner) ScanSource(fsys fs.FS, sources []SourcePath) ([]FileGroup, error) {
+func (sc *Scanner) ScanSources(fsys fs.FS, sources []SourcePath) ([]FileGroup, error) {
   groups := make([]FileGroup, 0)
   for _, s := range sources {
     roots, err := ReadLevel(fsys, s.Path, s.GroupingLevel)

@@ -14,11 +14,11 @@ import (
   . "htar/pkg/core"
 )
 
-func ScanSourceWithProgress(fsys fs.FS, sources []SourcePath) ([]FileGroup, error) {
-  return scanInternal(fsys, os.Stderr, sources)
+func ScanSourcesWithProgress(fsys fs.FS, sources []SourcePath) ([]FileGroup, error) {
+  return scanInteractive(fsys, os.Stderr, sources)
 }
 
-func scanInternal(fsys fs.FS, stderr io.Writer, sources []SourcePath) ([]FileGroup, error) {
+func scanInteractive(fsys fs.FS, stderr io.Writer, sources []SourcePath) ([]FileGroup, error) {
   var wg sync.WaitGroup
   defer wg.Wait()
 
@@ -28,7 +28,7 @@ func scanInternal(fsys fs.FS, stderr io.Writer, sources []SourcePath) ([]FileGro
   scanner := &Scanner{}
   go reportProgress(stderr, scanner, done)
 
-  groups, err := scanner.ScanSource(fsys, sources)
+  groups, err := scanner.ScanSources(fsys, sources)
   done <- true
   <- done
 

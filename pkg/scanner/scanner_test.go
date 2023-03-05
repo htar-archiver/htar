@@ -11,7 +11,7 @@ func TestScanner(t *testing.T) {
   config := []SourcePath{{Path: "var/pool", GroupingLevel: 2}}
 
   scanner := &Scanner{}
-  result, err := scanner.ScanSource(fsys, config)
+  result, err := scanner.ScanSources(fsys, config)
 
   assert.Nil(t, err)
   assert.Equal(t, 2, len(result))

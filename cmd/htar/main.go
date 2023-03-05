@@ -26,7 +26,7 @@ func htar() error {
   case cli.Scan:
   case cli.Archive:
     fsys := os.DirFS(".")
-    groups, err := scanner.ScanSourceWithProgress(fsys, config.Sources)
+    groups, err := scanner.ScanSourcesWithProgress(fsys, config.Sources)
     if err != nil {
       return err
     }

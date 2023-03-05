@@ -13,7 +13,7 @@ func main() {
 
   sources := []scanner.SourcePath{{Path: "var/pool/data", GroupingLevel: 2}}
   scanner := &scanner.Scanner{}
-  groups, err := scanner.ScanSource(fs, sources)
+  groups, err := scanner.ScanSources(fs, sources)
   if err != nil {
     panic(err)
   }

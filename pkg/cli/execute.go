@@ -3,7 +3,12 @@ package cli
 import (
   "errors"
   "os"
+  "os/exec"
+  "strconv"
+  "strings"
+  "syscall"
   "path/filepath"
+
   "github.com/jessevdk/go-flags"
 
   "htar/pkg/asciitree"
@@ -26,29 +31,6 @@ func Execute(args []string) error {
   default:
     return errors.New("command not implemented")
   }
-}
-
-func resolvePath(basepath, target string) (string, error) {
-  absolute, err := filepath.Abs(target)
-  if err != nil {
-    return "", err
-  }
-  return filepath.Rel(basepath, absolute)
-}
-
-func resolvePartitioner(opts Options) (partition.Partitioner, error) {
-  partitioner := &partition.LinearPartitioner{
-    Attributes: partition.Attributes{ MaxPartionSize: int64(opts.Archive.MaxPartionSize) },
-    AllowSplit: opts.Archive.AllowSplit,
-  }
-  return partitioner, nil
-}
-
-func resolvePacker(opts Options) (packer.Packer, error) {
-  packer := &packer.PipeArchiver{
-    Command: "mbuffer -R 10mb -o /dev/null",
-  }
-  return packer, nil
 }
 
 func executeArchive(opts Options) error {
@@ -99,4 +81,51 @@ func executeArchive(opts Options) error {
   }
 
   return nil
+}
+
+func resolvePath(basepath, target string) (string, error) {
+  absolute, err := filepath.Abs(target)
+  if err != nil {
+    return "", err
+  }
+  return filepath.Rel(basepath, absolute)
+}
+
+func resolvePartitioner(opts Options) (partition.Partitioner, error) {
+  partitioner := &partition.LinearPartitioner{
+    Attributes: partition.Attributes{
+      MaxPartionSize: int64(opts.Archive.Part.MaxPartionSize),
+    },
+    AllowSplit: opts.Archive.Part.AllowSplit,
+  }
+  return partitioner, nil
+}
+
+func resolvePacker(opts Options) (packer.Packer, error) {
+  cmd, err := resolveCmd(opts.Archive.Pipe.Cmd, opts.Archive.Pipe.Attached)
+  if err != nil {
+    return nil, err
+  }
+
+  packer := &packer.PipeArchiver{
+    Command: cmd,
+  }
+  return packer, nil
+}
+
+func resolveCmd(command string, attach bool) (*exec.Cmd, error) {
+  str, err := strconv.Unquote(command)
+  if err != nil {
+    str = command
+  }
+
+  parts := strings.Split(str, " ")
+  cmd := exec.Command(parts[0], parts[1:]...)
+
+  cmd.SysProcAttr = &syscall.SysProcAttr{
+    // Detach controlling terminal
+    Setsid: !attach,
+  }
+
+  return cmd, nil
 }

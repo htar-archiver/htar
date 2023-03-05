@@ -4,8 +4,6 @@ import (
   "io"
   "io/fs"
   "fmt"
-  "strconv"
-  "strings"
   "sync"
   "os"
   "os/exec"
@@ -18,7 +16,7 @@ import (
 )
 
 type PipeArchiver struct {
-  Command string
+  Command *exec.Cmd
   NextPartCallback func(int) bool
 }
 
@@ -45,15 +43,14 @@ func (a *PipeArchiver) writePipePart(fsys fs.FS, stderr io.Writer, part Partitio
   pipeReader, pipeWriter := io.Pipe()
 
   var errPipe error
-  cmd := parseCmd(a.Command)
-  fmt.Fprintf(stderr, "Start pipe: %v %v\n\n", cmd.Path, cmd.Args[1:])
+  fmt.Fprintf(stderr, "Start pipe: %v %v\n\n", a.Command.Path, a.Command.Args[1:])
 
   lines := make(chan string)
   
   wg.Add(1)
   go func() {
     defer wg.Done()
-    errPipe = pipe.Run(cmd, pipeReader, lines)
+    errPipe = pipe.Run(a.Command, pipeReader, lines)
   }()
 
   pg := make(chan archive.ProgressUpdate)
@@ -73,13 +70,4 @@ func (a *PipeArchiver) writePipePart(fsys fs.FS, stderr io.Writer, part Partitio
     return err
   }
   return errPipe
-}
-
-func parseCmd(command string) *exec.Cmd {
-  str, err := strconv.Unquote(command)
-  if err != nil {
-    str = command
-  }
-  parts := strings.Split(str, " ")
-  return exec.Command(parts[0], parts[1:]...)
 }

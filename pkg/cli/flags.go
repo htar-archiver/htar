@@ -15,8 +15,14 @@ type Options struct {
   Archive struct {
     DryRun bool `long:"scan" description:"Only scan sources and print partitions."`
     PrintFileCount int `long:"print-count" default:"3" description:"Preview file count in partition tree"`
-    MaxPartionSize DataSizeString `long:"size" description:"Max partition size"`
-    AllowSplit bool `long:"split" description:"Allow splitting file groups into multiple partitions"`
+    Part struct {
+      MaxPartionSize DataSizeString `long:"size" description:"Max partition size"`
+      AllowSplit bool `long:"split" description:"Allow splitting file groups into multiple partitions"`
+    } `group:"Partioning options"`
+    Pipe struct {
+      Cmd string `long:"pipe" description:"Execute command per partion and pipe archive to stdin"`
+      Attached bool `long:"pipe-attached" description:"Attach command to current terminal. By default execution creates a new session using setsid and multiplex stdout and stderr."`
+    } `group:"Write to pipe"`
     Positional struct {
       Sources []SourcePath `required:"1" positional-arg-name:"DIR:LEVEL"`
     } `positional-args:"yes"`

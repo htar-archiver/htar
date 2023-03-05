@@ -34,17 +34,14 @@ func Execute(args []string) error {
 }
 
 func executeArchive(opts Options) error {
-  root := "/"
-  sources := make([]scanner.SourcePath, len(opts.Archive.Positional.Sources))
-  for i, v := range opts.Archive.Positional.Sources {
-    p, err := resolvePath(root, v.Path)
-    if err != nil {
-      return err
-    }
-    sources[i] = scanner.SourcePath {
-      Path: p,
-      GroupingLevel: v.GroupingLevel,
-    }
+  root, err := filepath.Abs(opts.Archive.Root)
+  if err != nil {
+    return err
+  }
+
+  sources, err := resolveSources(root, opts.Archive.Positional.Sources)
+  if err != nil {
+    return err
   }
 
   fsys := os.DirFS(root)
@@ -81,6 +78,21 @@ func executeArchive(opts Options) error {
   }
 
   return nil
+}
+
+func resolveSources(root string, sources []SourcePath) ([]scanner.SourcePath, error) {
+  resolved := make([]scanner.SourcePath, len(sources))
+  for i, v := range sources {
+    p, err := resolvePath(root, v.Path)
+    if err != nil {
+      return nil, err
+    }
+    resolved[i] = scanner.SourcePath {
+      Path: p,
+      GroupingLevel: v.GroupingLevel,
+    }
+  }
+  return resolved, nil
 }
 
 func resolvePath(basepath, target string) (string, error) {

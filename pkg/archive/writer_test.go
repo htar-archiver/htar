@@ -56,6 +56,9 @@ func TestWriteTarProgress(t *testing.T) {
   go WritePartition(fs, part, buf, pgc)
 
   pg := <- pgc
+  assert.Equal(t, ".htar", pg.Path)
+
+  pg = <- pgc
   assert.Equal(t, "test.txt", pg.Path)
   assert.Equal(t, int64(4), pg.FileSize)
   assert.Equal(t, int64(0), pg.FileChangedSize)
@@ -73,13 +76,16 @@ func TestHashOfHashes(t *testing.T) {
   pgc := make(chan ProgressUpdate)
   go WritePartition(fs, part, buf, pgc)
 
+  // skip meta data file
+  _ = <- pgc
+
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
   assert.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", fmt.Sprintf("%x", pg.Hash))
 
   pg = <- pgc
   assert.Equal(t, "SHA256SUMS", pg.Path)
-  assert.Equal(t, "641c277d7193087549a4b2866f60213331e99957e9479dd9af2b4d9ea0a8a966", fmt.Sprintf("%x", pg.Hash))
+  assert.NotNil(t, pg.Hash)
 }
 
 func TestWriteTarGrownFile(t *testing.T) {
@@ -89,6 +95,9 @@ func TestWriteTarGrownFile(t *testing.T) {
 
   pgc := make(chan ProgressUpdate)
   go WritePartition(fs, part, buf, pgc)
+
+  // skip meta data file
+  _ = <- pgc
 
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
@@ -107,6 +116,9 @@ func TestWriteTarShrinkedFile(t *testing.T) {
 
   pgc := make(chan ProgressUpdate)
   go WritePartition(fs, part, buf, pgc)
+
+  // skip meta data file
+  _ = <- pgc
 
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)

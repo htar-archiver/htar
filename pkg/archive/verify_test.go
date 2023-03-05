@@ -22,6 +22,9 @@ func TestVerifyPartition(t *testing.T) {
     err = VerifyPartition(buf, pgc)
   }()
 
+  // skip meta data file
+  _ = <- pgc
+
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
   assert.Equal(t, int64(4), pg.FileSize)

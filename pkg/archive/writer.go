@@ -23,6 +23,18 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
   writtenFiles := int(0)
   writtenBytes := int64(0)
 
+  if _, hash, err := writeMeta(tw, part, ".htar"); err != nil {
+    return fmt.Errorf("error writing meta file %v: ", err)
+  } else {
+    hashes[".htar"] = hash
+    if progress != nil {
+      progress <- ProgressUpdate{
+        Path: ".htar",
+        Hash: hash,
+      }
+    }
+  }
+
   for groupIndex := range part.Groups {
     group := &part.Groups[groupIndex]
 
@@ -81,6 +93,18 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
   }
 
   return nil
+}
+
+func writeMeta(tw *tar.Writer, part Partition, path string) (int64, []byte, error) {
+  meta := NewMeta(part.TotalFiles, part.TotalSize)
+
+  buf := new(bytes.Buffer)
+  err := meta.Encode(buf)
+  if err != nil {
+    return 0, nil, err
+  }
+
+  return writeBuffer(tw, buf, path)
 }
 
 func writeFile(tw *tar.Writer, fsys fs.FS, path string) (int64, []byte, error) {

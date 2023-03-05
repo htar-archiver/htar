@@ -39,6 +39,8 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
       if header.Name == "SHA256SUMS" {
         hashesFile = new(bytes.Buffer)
         buf = hashesFile
+      } else if header.Name == ".htar" {
+        buf = new(bytes.Buffer)
       }
 
       read, hash, err := readFile(tr, buf)
@@ -50,8 +52,11 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
         hashes[header.Name] = hash
       }
 
-      readFiles += 1
-      readBytes += read
+      if buf == nil {
+        // do not count meta files
+        readFiles += 1
+        readBytes += read
+      }
 
       if progress != nil {
         progress <- ProgressUpdate{

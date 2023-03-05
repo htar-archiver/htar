@@ -1,4 +1,4 @@
-package cli
+package packer
 
 import (
   "os"
@@ -37,7 +37,7 @@ func TestCreateArchives(t *testing.T) {
   assert.False(t, pathExists(dest[0]))
   assert.False(t, pathExists(dest[1]))
 
-  err := archiver.WritePartitions(fs, os.Stdout, parts)
+  err := archiver.WritePartitions(fs, parts)
   assert.Nil(t, err)
 
   assert.True(t, pathExists(dest[0]))
@@ -59,6 +59,6 @@ func TestDoNotOverwrite(t *testing.T) {
   assert.Nil(t, err)
   f.Close()
 
-  err = archiver.WritePartitions(fs, os.Stdout, parts)
+  err = archiver.WritePartitions(fs, parts)
   assert.Regexp(t, "file exists", err.Error())
 }

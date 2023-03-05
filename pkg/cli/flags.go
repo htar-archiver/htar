@@ -4,7 +4,7 @@ import (
   "flag"
 )
 
-func CreateCompConfig(args []string) (*CompConfig, error) {
+func ConfigFromArgs(args []string) (*CompConfig, error) {
   config := &CompConfig{}
 
   flags := flag.NewFlagSet(args[0], flag.ContinueOnError)

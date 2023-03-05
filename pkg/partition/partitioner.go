@@ -5,5 +5,5 @@ import (
 )
 
 type Partitioner interface{
-  MakePartitions(groups []FileGroup) []Partition
+  MakePartitions(groups []FileGroup) ([]Partition, error)
 }

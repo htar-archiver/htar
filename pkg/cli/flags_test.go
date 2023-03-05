@@ -6,7 +6,7 @@ import (
 )
 
 func TestUnknownArg(t *testing.T) {
-  config, err := CreateCompConfig([]string{ "arg0", "--not-existing" })
+  config, err := ConfigFromArgs([]string{ "arg0", "--not-existing" })
   assert.Nil(t, config)
   assert.NotNil(t, err)
 }

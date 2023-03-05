@@ -4,11 +4,21 @@ import (
   "htar/pkg/asciitree"
   "htar/pkg/partition"
   "htar/pkg/scanner"
+  "htar/pkg/packer"
+)
+
+type SubCommand int
+
+const (
+  Scan SubCommand = iota
+  Archive
+  Verify
 )
 
 type CompConfig struct {
+  AsciiTree asciitree.PrintOptions
+  Command SubCommand
   Sources []scanner.SourcePath
   Partitioner partition.Partitioner
-  AsciiTree asciitree.PrintOptions
-  Archiver Archiver
+  Packer packer.Packer
 }

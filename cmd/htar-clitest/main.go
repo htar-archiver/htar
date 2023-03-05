@@ -1,11 +1,10 @@
 package main
 
 import (
-  "os"
   "htar/pkg/asciitree"
-  "htar/pkg/cli"
   "htar/pkg/partition"
   "htar/pkg/scanner"
+  "htar/pkg/packer"
   "htar/pkg/testdata"
 )
 
@@ -32,17 +31,17 @@ func main() {
   ascii := &asciitree.PrintOptions{
     FileCount: 3,
   }
-  ascii.PrintPartitions(os.Stdout, linear.MaxPartionSize, parts)
+  ascii.PrintPartitions(linear.MaxPartionSize, parts)
 
-  /*archiver := &cli.PipeArchiver{
+  packer := &packer.PipeArchiver{
     Command: "mbuffer -R 10mb -o /dev/null",
-  }*/
-
-  archiver := &cli.FileArchiver{
-    Destination: "test.tar",
   }
 
-  if err := archiver.WritePartitions(fs, os.Stdout, parts); err != nil {
+  /*packer := &packer.FileArchiver{
+    Destination: "test.tar",
+  }*/
+
+  if err := packer.WritePartitions(fs, parts); err != nil {
     panic(err)
   }
 }

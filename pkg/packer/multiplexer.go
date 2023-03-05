@@ -1,4 +1,4 @@
-package cli
+package packer
 
 import (
   "io"
@@ -7,7 +7,7 @@ import (
   "htar/pkg/archive"
 )
 
-func multiplexStdout(stdout io.Writer, lines <-chan string, progress <-chan archive.ProgressUpdate) {
+func multiplexOutput(stderr io.Writer, lines <-chan string, progress <-chan archive.ProgressUpdate) {
   clean := true
   for lines != nil || progress != nil {
     select {
@@ -19,9 +19,9 @@ func multiplexStdout(stdout io.Writer, lines <-chan string, progress <-chan arch
       if len(line) < 1 || line == "\r" {
         continue
       } else if line[0] == '\r' && len(line) >= 1 {
-        fmt.Fprintf(stdout, "\r> %v", line[1:])
+        fmt.Fprintf(stderr, "\r> %v", line[1:])
       } else {
-        fmt.Fprintf(stdout, "> %v", line)
+        fmt.Fprintf(stderr, "> %v", line)
       }
       clean = line[len(line) -1] == '\n'
 
@@ -31,10 +31,10 @@ func multiplexStdout(stdout io.Writer, lines <-chan string, progress <-chan arch
         continue
       }
       if !clean {
-        fmt.Fprint(stdout, "\n")
+        fmt.Fprint(stderr, "\n")
       }
       percent := percent(float64(pg.CurrentSize), float64(pg.TotalSize))
-      fmt.Fprintf(stdout, "[%d/%d] %v %v\n", pg.CurrentFiles, pg.TotalFiles, percent, pg.Path)
+      fmt.Fprintf(stderr, "[%d/%d] %v %v\n", pg.CurrentFiles, pg.TotalFiles, percent, pg.Path)
       clean = true
     }
   }

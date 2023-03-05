@@ -1,10 +1,10 @@
 package  main
 
 import (
+  "errors"
   "os"
   "fmt"
-  "htar/pkg/asciitree"
-  "htar/pkg/partition"
+  "htar/pkg/cli"
   "htar/pkg/scanner"
 )
 
@@ -17,28 +17,36 @@ func main() {
 }
 
 func htar() error {
-  sources := []scanner.SourcePath{{Path: ".", GroupingLevel: 1}}
-  scanner := &scanner.Scanner{}
-  groups, err := scanner.ScanSource(os.DirFS("."), sources)
+  config, err := cli.ConfigFromArgs(os.Args)
   if err != nil {
     return err
   }
 
-  linear := &partition.LinearPartitioner{
-    MaxPartionSize: 10 * 1024 * 1024,
-    AllowSplit: true,
-  }
+  switch config.Command {
+  case cli.Scan:
+  case cli.Archive:
+    fsys := os.DirFS(".")
+    groups, err := scanner.ScanSourceWithProgress(fsys, config.Sources)
+    if err != nil {
+      return err
+    }
+  
+    parts, err := config.Partitioner.MakePartitions(groups)
+    if err != nil {
+      return err
+    }
+  
+    config.AsciiTree.PrintPartitions(0, parts)
 
-  parts, err := linear.MakePartitions(groups)
-  if err != nil {
-    return err
-  }
+    if config.Command == cli.Archive {
+      if err := config.Packer.WritePartitions(fsys, parts); err != nil {
+        return err
+      }
+    }
 
-  ascii := &asciitree.PrintOptions{
-    FileCount: 3,
+  default:
+    return errors.New("command not implemented")
   }
-
-  ascii.PrintPartitions(os.Stdout, linear.MaxPartionSize, parts)
 
   return nil
 }

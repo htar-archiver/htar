@@ -14,7 +14,11 @@ type PrintOptions struct {
   FileCount int
 }
 
-func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize int64, parts []Partition) {
+func (o *PrintOptions) PrintPartitions(partionSize int64, parts []Partition) {
+  o.printParts(os.Stderr, partionSize, parts)
+}
+
+func (o *PrintOptions) printParts(w io.Writer, partionSize int64, parts []Partition) {
   totalFiles := 0
   totalSize := int64(0)
 

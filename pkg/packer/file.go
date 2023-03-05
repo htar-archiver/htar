@@ -1,4 +1,4 @@
-package cli
+package packer
 
 import (
   "errors"
@@ -21,7 +21,11 @@ type FileArchiver struct {
   Destination string
 }
 
-func (a *FileArchiver) WritePartitions(fsys fs.FS, stdout io.Writer, parts []Partition) error {
+func (a *FileArchiver) WritePartitions(fsys fs.FS, parts []Partition) error {
+  return a.writeFileParts(fsys, os.Stderr, parts)
+}
+
+func (a *FileArchiver) writeFileParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {
   names := make([]string, len(parts))
   files := make([]*os.File, len(parts))
 
@@ -39,9 +43,9 @@ func (a *FileArchiver) WritePartitions(fsys fs.FS, stdout io.Writer, parts []Par
   // write all partitions
   for partIndex, part := range parts {
     caption := color.Partition.Sprintf("Write partition #%d to %q", partIndex, names[partIndex])
-    fmt.Fprintf(stdout, "\n\n%v\n", caption)
+    fmt.Fprintf(stderr, "\n\n%v\n", caption)
 
-    err := a.writePartition(fsys, stdout, part, files[partIndex])
+    err := a.writeFilePart(fsys, stderr, part, files[partIndex])
     files[partIndex].Close()
 
     if err != nil {
@@ -52,14 +56,14 @@ func (a *FileArchiver) WritePartitions(fsys fs.FS, stdout io.Writer, parts []Par
   return nil
 }
 
-func (a *FileArchiver) writePartition(fsys fs.FS, stdout io.Writer, part Partition, dest io.Writer) error {
+func (a *FileArchiver) writeFilePart(fsys fs.FS, stderr io.Writer, part Partition, dest io.Writer) error {
   pg := make(chan archive.ProgressUpdate)
 
   var wg sync.WaitGroup
   wg.Add(1)
   go func() {
     defer wg.Done()
-    multiplexStdout(stdout, nil, pg)
+    multiplexOutput(stderr, nil, pg)
   }()
 
   err := archive.WritePartition(fsys, part, dest, pg)

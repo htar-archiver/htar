@@ -33,8 +33,17 @@ func multiplexStdout(stdout io.Writer, lines <-chan string, progress <-chan arch
       if !clean {
         fmt.Fprint(stdout, "\n")
       }
-      fmt.Fprintf(stdout, "[%d/%d] %v\n", pg.CurrentFiles, pg.TotalFiles, pg.Path)
+      percent := percent(float64(pg.CurrentSize), float64(pg.TotalSize))
+      fmt.Fprintf(stdout, "[%d/%d] %v %v\n", pg.CurrentFiles, pg.TotalFiles, percent, pg.Path)
       clean = true
     }
   }
+}
+
+func percent(value float64, max float64) string {
+  if value < 0 || max < 1 {
+    return "------"
+  }
+  percent := value / max * float64(100)
+  return fmt.Sprintf("%5.1f%%", percent)
 }

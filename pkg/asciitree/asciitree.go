@@ -73,7 +73,7 @@ func basename(parent string, child string) string {
 func getRelSize(value int64, max int64) string {
   if max > 0 {
     percent := float64(value) / float64(max) * float64(100)
-    return fmt.Sprintf("%8v %2.0f%%", datasize.ByteSize(value).HumanReadable(), percent)
+    return fmt.Sprintf("%8v %3.0f%%", datasize.ByteSize(value).HumanReadable(), percent)
   }
   return datasize.ByteSize(value).HumanReadable()
 }

@@ -1,5 +1,9 @@
 package partition
 
+import (
+  . "htar/pkg/core"
+)
+
 func makeTestGroups() []FileGroup {
   return []FileGroup {
     FileGroup {

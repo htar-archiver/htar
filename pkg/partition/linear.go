@@ -2,8 +2,8 @@ package partition
 
 import (
   "fmt"
-
   "github.com/c2h5oh/datasize"
+  . "htar/pkg/core"
 )
 
 type LinearPartitioner struct {

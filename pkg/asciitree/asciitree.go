@@ -83,8 +83,11 @@ func getRelSize(value int64, max int64) string {
 }
 
 func getAvgSize(value int64, count int) string {
-  avg := value / int64(count)
-  return fmt.Sprintf("⌀%v", datasize.ByteSize(avg).HumanReadable());
+  if count > 0 {
+    avg := value / int64(count)
+    return fmt.Sprintf("⌀%v", datasize.ByteSize(avg).HumanReadable());
+  }
+  return "n/a"
 }
 
 func (o *PrintOptions) getBullet(index int, len int) string {

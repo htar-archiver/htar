@@ -17,3 +17,16 @@ func TestNoPanic(t *testing.T) {
   tree.printParts(buf, 42, []Partition{ part })
   assert.True(t, buf.Len() > 0)
 }
+
+func TestNoDivideByZero(t *testing.T) {
+  part := Partition{
+    Groups: []FileGroup{
+      FileGroup{},
+    },
+  }
+
+  buf := new(bytes.Buffer)
+  tree := &PrintOptions{FileCount: 42}
+  tree.printParts(buf, 42, []Partition{ part })
+  assert.True(t, buf.Len() > 0)
+}

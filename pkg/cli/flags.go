@@ -14,16 +14,19 @@ type SourcePath scanner.SourcePath
 type Options struct {
   Pack struct {
     DryRun bool `long:"scan" description:"Only scan sources and print partitions."`
-    PrintFileCount int `long:"print-count" default:"3" description:"Preview file count in partition tree"`
-    Root string `long:"root" default:"/" description:"Make paths relative"`
+    PrintFileCount int `long:"print-count" default:"3" description:"Preview file count of partition tree."`
+    Root string `short:"C" long:"root" default:"/" description:"Make paths relative."`
     Part struct {
-      MaxPartionSize DataSizeString `long:"size" description:"Max partition size"`
-      AllowSplit bool `long:"split" description:"Allow splitting file groups into multiple partitions"`
+      MaxPartionSize DataSizeString `long:"size" description:"Max partition size."`
+      AllowSplit bool `long:"split" description:"Allow splitting file groups into multiple partitions."`
     } `group:"Partioning options"`
     Pipe struct {
-      Cmd string `long:"pipe" description:"Execute command per partion and pipe archive to stdin"`
+      Cmd string `long:"pipe" description:"Execute command per partion and pipe archive to stdin."`
       Attached bool `long:"pipe-attached" description:"Attach command to current terminal. By default execution creates a new session using setsid and multiplex stdout and stderr."`
     } `group:"Write to pipe"`
+    File struct {
+      Name string `short:"f" long:"output" description:"Use archive file or device."`
+    } `group:"Write to file"`
     Positional struct {
       Sources []SourcePath `required:"1" positional-arg-name:"DIR:LEVEL"`
     } `positional-args:"yes"`

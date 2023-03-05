@@ -1,6 +1,7 @@
 package cli
 
 import (
+  "errors"
   "os/exec"
   "strconv"
   "strings"
@@ -45,11 +46,20 @@ func resolvePartitioner(opts Options) (partition.Partitioner, error) {
   return partitioner, nil
 }
 
-func resolvePacker(opts Options) (packer.Packer) {
-  packer := &packer.PipePacker{
-    Command: resolveCmd(opts.Pack.Pipe.Cmd, opts.Pack.Pipe.Attached),
+func resolvePacker(opts Options) (packer.Packer, error) {
+  if opts.Pack.File.Name != "" && opts.Pack.Pipe.Cmd == "" {
+    return &packer.FilePacker{
+      Destination: opts.Pack.File.Name,
+    }, nil
   }
-  return packer
+  
+  if opts.Pack.File.Name == "" && opts.Pack.Pipe.Cmd != "" {
+    return &packer.PipePacker{
+      Command: resolveCmd(opts.Pack.Pipe.Cmd, opts.Pack.Pipe.Attached),
+    }, nil
+  }
+
+  return nil, errors.New("could not resolve packer")
 }
 
 func resolveCmd(command string, attach bool) (*exec.Cmd) {

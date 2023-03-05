@@ -28,6 +28,11 @@ func Execute(args []string) error {
 }
 
 func executePack(opts Options) error {
+  if !opts.Pack.DryRun && opts.Pack.File.Name == "" && opts.Pack.Pipe.Cmd == "" ||
+      (opts.Pack.File.Name != "" && opts.Pack.Pipe.Cmd != "") {
+    return errors.New("single destination or scan only argument is required")
+  }
+
   root, err := filepath.Abs(opts.Pack.Root)
   if err != nil {
     return err
@@ -60,7 +65,11 @@ func executePack(opts Options) error {
   ascii.PrintPartitions(partitioner.GetMaxSize(), parts)
 
   if !opts.Pack.DryRun {
-    packer := resolvePacker(opts)
+    packer, err := resolvePacker(opts)
+    if err != nil {
+      return err
+    }
+
     err = packer.WritePartitions(fsys, parts)
     if err != nil {
       return err

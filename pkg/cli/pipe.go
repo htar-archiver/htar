@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
   "io"
@@ -9,6 +9,7 @@ import (
   "sync"
   "os/exec"
 
+  "htar/pkg/color"
   "htar/pkg/archive"
   "htar/pkg/pipe"
 
@@ -24,9 +25,11 @@ func (a *PipeArchiver) WritePartitions(fsys fs.FS, stdout io.Writer, parts []Par
   for partIndex, part := range parts {
     if a.NextPartCallback != nil && a.NextPartCallback(partIndex) {
       return fmt.Errorf("aborted writing partition #%d", partIndex)
-      if err := a.writePartition(fsys, stdout, part); err != nil {
-        return err
-      }
+    }
+    caption := color.Partition.Sprintf("Write partition #%d", partIndex)
+    fmt.Fprintf(stdout, "\n\n%v\n", caption)
+    if err := a.writePartition(fsys, stdout, part); err != nil {
+      return err
     }
   }
   return nil
@@ -38,8 +41,10 @@ func (a *PipeArchiver) writePartition(fsys fs.FS, stdout io.Writer, part Partiti
 
   var errPipe error
   cmd := parseCmd(a.Command)
-  lines := make(chan string)
+  fmt.Fprintf(stdout, "Start pipe: %v %v\n\n", cmd.Path, cmd.Args[1:])
 
+  lines := make(chan string)
+  
   wg.Add(1)
   go func() {
     defer wg.Done()
@@ -54,11 +59,14 @@ func (a *PipeArchiver) writePartition(fsys fs.FS, stdout io.Writer, part Partiti
     multiplexStdout(stdout, lines, pg)
   }()
 
-  if err := archive.WritePartition(fsys, part, pipeWriter, pg); err != nil {
-    return err
-  }
+  err := archive.WritePartition(fsys, part, pipeWriter, pg)
+  pipeWriter.Close()
 
   wg.Wait()
+
+  if err != nil {
+    return err
+  }
   return errPipe
 }
 
@@ -73,16 +81,27 @@ func parseCmd(command string) *exec.Cmd {
 
 func multiplexStdout(stdout io.Writer, lines <-chan string, progress <-chan archive.ProgressUpdate) {
   clean := true
-  for {
+  for lines != nil || progress != nil {
     select {
-    case line := <- lines:
-      if line[0] == '\r' {
+    case line, ok := <- lines:
+      if !ok {
+        lines = nil
+        continue
+      }
+      if len(line) < 1 || line == "\r" {
+        continue
+      } else if line[0] == '\r' && len(line) >= 1 {
         fmt.Fprintf(stdout, "\r> %v", line[1:])
       } else {
         fmt.Fprintf(stdout, "> %v", line)
       }
       clean = line[len(line) -1] == '\n'
-    case pg := <- progress:
+
+    case pg, ok := <- progress:
+      if !ok {
+        progress = nil
+        continue
+      }
       if !clean {
         fmt.Fprint(stdout, "\n")
       }

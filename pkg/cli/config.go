@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
   "htar/pkg/asciitree"

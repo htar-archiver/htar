@@ -6,7 +6,7 @@ import (
   "fmt"
   "strings"
   "github.com/c2h5oh/datasize"
-  "github.com/gookit/color"
+  "htar/pkg/color"
   . "htar/pkg/core"
 )
 
@@ -21,12 +21,12 @@ func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize int64, parts []P
   for partIndex, part := range parts {
     partStr := fmt.Sprintf("Partition %d: %v, %d files",
       partIndex, getRelSize(part.TotalSize, partionSize), part.TotalFiles)
-    fmt.Fprintf(w, "%v\n", o.fgBlue(partStr))
+    fmt.Fprintf(w, "%v\n", color.Partition.Render(partStr))
 
     for groupIndex, group := range part.Groups {
       bullet := o.getBullet(groupIndex, len(part.Groups))
       fmt.Fprintf(w, "%v %8v %v (%d files, %v)\n",
-        bullet, o.bgGray(getRelSize(group.TotalSize, part.TotalSize)), group.Name,
+        bullet, color.FileGroupSize.Render(getRelSize(group.TotalSize, part.TotalSize)), group.Name,
         len(group.Files), getAvgSize(group.TotalSize, len(group.Files)))
 
       if (o.FileCount > 0) {
@@ -34,7 +34,7 @@ func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize int64, parts []P
           children := min(o.FileCount, len(group.Files))
           pad := fmt.Sprintf("%v %v",
             o.getVertical(groupIndex, len(part.Groups)),
-            o.fgGray(o.getBullet(fileIndex, children)))
+            color.FileGroupFiles.Render(o.getBullet(fileIndex, children)))
 
           if fileIndex + 1 == children && len(group.Files) > children {
             fmt.Fprintf(w, "%v ...\n", pad)
@@ -95,16 +95,4 @@ func (o *PrintOptions) getVertical(index int, len int) string {
     return " "
   }
   return "│"
-}
-
-func (o *PrintOptions) fgBlue(value string) string {
-  return color.Style{color.FgCyan, color.OpBold}.Render(value)
-}
-
-func (o *PrintOptions) bgGray(value string) string {
-  return color.Style{color.BgGray}.Render(value)
-}
-
-func (o *PrintOptions) fgGray(value string) string {
-  return color.Style{color.FgGray}.Render(value)
 }

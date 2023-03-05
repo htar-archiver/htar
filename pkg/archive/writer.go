@@ -10,7 +10,7 @@ import(
   . "htar/pkg/core"
 )
 
-func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan ProgressUpdate) error {
+func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<- ProgressUpdate) error {
   if progress != nil {
     defer close(progress)
   }
@@ -35,9 +35,14 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan 
       writtenFiles += 1
       writtenBytes += uint64(written)
 
+      changed := written - int64(file.Size)
+      totalSize += uint64(changed)
+      
       if progress != nil {
         progress <- ProgressUpdate{
           Path: file.Path,
+          FileSize: uint64(file.Size),
+          FileChangedSize: changed,
           CurrentFiles: writtenFiles,
           CurrentSize: writtenBytes,
           TotalFiles: part.TotalFiles,
@@ -48,7 +53,7 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan 
   }
 
   buf := hashesFile(hashes) 
-  if _, err := writeBuffer(tw, buf, "SHA256SUMS"); err != nil {
+  if _, _, err := writeBuffer(tw, buf, "SHA256SUMS"); err != nil {
     return fmt.Errorf("error writing checksum file %v: ", err)
   }
 
@@ -103,7 +108,7 @@ func hashesFile(hashes map[string][]byte) *bytes.Buffer {
   return buf
 }
 
-func writeBuffer(tw *tar.Writer, content *bytes.Buffer, path string) (int64, error) {
+func writeBuffer(tw *tar.Writer, content *bytes.Buffer, path string) (int64, []byte, error) {
   header := &tar.Header{
     Name: path,
     Mode: 0644,
@@ -112,13 +117,16 @@ func writeBuffer(tw *tar.Writer, content *bytes.Buffer, path string) (int64, err
   }
 
   if err := tw.WriteHeader(header); err != nil {
-    return 0, err
+    return 0, nil, err
   }
 
-  written, err := tw.Write(content.Bytes());
+  sha := sha256.New()
+  mw := io.MultiWriter(sha, tw)
+
+  written, err := mw.Write(content.Bytes());
   if err != nil {
-    return 0, err
+    return 0, nil, err
   }
 
-  return int64(written), nil
+  return int64(written), sha.Sum(nil), nil
 }

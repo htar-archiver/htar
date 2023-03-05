@@ -60,6 +60,7 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
           part = Partition{}
         }
         part.Groups = append(part.Groups, d)
+        part.TotalFiles += len(d.Files)
         part.TotalSize += d.TotalSize
       }
     }

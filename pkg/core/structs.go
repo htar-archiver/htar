@@ -6,6 +6,7 @@ import (
 
 type Partition struct {
   Groups []FileGroup
+  TotalFiles int
   TotalSize datasize.ByteSize
 }
 

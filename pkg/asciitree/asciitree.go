@@ -19,10 +19,8 @@ func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize datasize.ByteSiz
   totalSize := datasize.ByteSize(0)
 
   for partIndex, part := range parts {
-    partFiles := getFileCount(part);
-
     partStr := fmt.Sprintf("Partition %d: %v, %d files",
-      partIndex, getRelSize(part.TotalSize, partionSize), partFiles)
+      partIndex, getRelSize(part.TotalSize, partionSize), part.TotalFiles)
     fmt.Fprintf(w, "%v\n", o.fgBlue(partStr))
 
     for groupIndex, group := range part.Groups {
@@ -47,7 +45,7 @@ func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize datasize.ByteSiz
       }
     }
 
-    totalFiles += partFiles
+    totalFiles += part.TotalFiles
     totalSize += part.TotalSize
 
     fmt.Fprint(w, "\n")
@@ -82,14 +80,6 @@ func getRelSize(value datasize.ByteSize, max datasize.ByteSize) string {
 func getAvgSize(value datasize.ByteSize, count int) string {
   avg := value / datasize.ByteSize(count)
   return fmt.Sprintf("⌀%v", avg.HumanReadable());
-}
-
-func getFileCount(part Partition) int {
-  count := 0
-  for _, g := range part.Groups {
-    count += len(g.Files)
-  }
-  return count
 }
 
 func (o *PrintOptions) getBullet(index int, len int) string {

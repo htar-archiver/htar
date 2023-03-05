@@ -6,6 +6,7 @@ import(
   "fmt"
   "io"
   "strings"
+  "sort"
 )
 
 var hashesFile = "SHA256SUMS"
@@ -13,8 +14,14 @@ var hashesFile = "SHA256SUMS"
 type Hashes map[string][]byte
 
 func EncodeHashes(hashes Hashes, writer io.Writer) error {
-  for path, hash := range hashes {
-    line := fmt.Sprintf("%x  %v\n", hash, path);
+  keys := make([]string, 0, len(hashes))
+  for k := range hashes {
+    keys = append(keys, k)
+  }
+  sort.Strings(keys)
+
+  for _, path := range keys {
+    line := fmt.Sprintf("%x  %v\n", hashes[path], path);
     if _, err := io.WriteString(writer, line); err != nil {
       return err
     }

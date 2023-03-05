@@ -3,6 +3,7 @@ package  main
 import (
   "os"
   "fmt"
+  "htar/pkg/asciitree"
   "htar/pkg/partition"
   "htar/pkg/scanner"
 )
@@ -32,12 +33,7 @@ func htar() error {
     return err
   }
 
-  for partIndex, part := range parts {
-    fmt.Printf("Partition %d: %v\n", partIndex, part.TotalSize.HumanReadable())
-    for _, group := range part.Groups {
-      fmt.Printf("  %v %v\n", group.TotalSize.HumanReadable(), group.Name)
-    }
-  }
+  asciitree.PrintPartitions(os.Stdout, parts)
 
   return nil
 }

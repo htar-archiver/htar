@@ -3,10 +3,11 @@ package scanner
 import (
   "testing"
   "github.com/stretchr/testify/assert"
+  "htar/pkg/testdata"
 )
 
 func TestScanner(t *testing.T) {
-  fsys := makeTestFS()
+  fsys := testdata.MakeTestFS()
   config := []SourcePath{{Path: "var/pool", GroupingLevel: 2}}
   result, err := ScanSource(fsys, config)
   assert.Nil(t, err)

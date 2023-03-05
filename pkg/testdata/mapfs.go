@@ -1,12 +1,9 @@
-package scanner
+package testdata
 
 import (
   "bytes"
-  "io/fs"
   "math"
-  "testing"
   "testing/fstest"
-  "github.com/stretchr/testify/assert"
 )
 
 var testFileContent = []byte("This is unit testing file content\n")
@@ -17,7 +14,7 @@ func makeFileBytes(sizeKb int) []byte {
   return bytes.Repeat(testFileContent, lines)[:size]
 }
 
-func makeTestFS() fstest.MapFS {
+func MakeTestFS() fstest.MapFS {
   m := make(fstest.MapFS)
   m["var/pool/data/Documents/Notes.txt"] = &fstest.MapFile{
 		Mode: 0666,
@@ -48,11 +45,4 @@ func makeTestFS() fstest.MapFS {
     Data: makeFileBytes(80),
 	}
   return m
-}
-
-func TestMapFS(t *testing.T) {
-  fsys := makeTestFS()
-  files, err := fs.ReadDir(fsys, "var/pool/data")
-  assert.Nil(t, err)
-  assert.True(t, len(files) > 1)
 }

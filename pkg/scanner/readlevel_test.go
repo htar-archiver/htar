@@ -3,10 +3,11 @@ package scanner
 import (
   "testing"
   "github.com/stretchr/testify/assert"
+  "htar/pkg/testdata"
 )
 
 func TestReadLevel0(t *testing.T) {
-  fsys := makeTestFS()
+  fsys := testdata.MakeTestFS()
   result, err := ReadLevel(fsys, "var", 0);
   assert.Nil(t, err)
   assert.Equal(t, 1, len(result))
@@ -14,7 +15,7 @@ func TestReadLevel0(t *testing.T) {
 }
 
 func TestReadLevel1(t *testing.T) {
-  fsys := makeTestFS()
+  fsys := testdata.MakeTestFS()
   result, err := ReadLevel(fsys, "var/pool", 1);
   assert.Nil(t, err)
   assert.Equal(t, 1, len(result))
@@ -22,7 +23,7 @@ func TestReadLevel1(t *testing.T) {
 }
 
 func TestReadLevel3(t *testing.T) {
-  fsys := makeTestFS()
+  fsys := testdata.MakeTestFS()
   result, err := ReadLevel(fsys, "var", 3);
   assert.Nil(t, err)
   assert.Equal(t, 2, len(result))
@@ -31,7 +32,7 @@ func TestReadLevel3(t *testing.T) {
 }
 
 func TestReadWithFiles(t *testing.T) {
-  fsys := makeTestFS()
+  fsys := testdata.MakeTestFS()
   result, err := ReadLevel(fsys, "var/pool/data/Documents", 1);
   assert.Nil(t, err)
   assert.Equal(t, 3, len(result))

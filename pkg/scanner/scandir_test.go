@@ -3,10 +3,11 @@ package scanner
 import (
   "testing"
   "github.com/stretchr/testify/assert"
+  "htar/pkg/testdata"
 )
 
 func TestScanDir(t *testing.T) {
-  fsys := makeTestFS()
+  fsys := testdata.MakeTestFS()
   result, err := ScanDir(fsys, "var/pool/data/Documents")
   assert.Nil(t, err)
   assert.Equal(t, 28 * 1024, int(result.TotalSize))

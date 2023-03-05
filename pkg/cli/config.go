@@ -10,7 +10,7 @@ import (
 type SubCommand int
 
 const (
-  Scan SubCommand = iota
+  Scan SubCommand = iota + 1
   Archive
   Verify
 )

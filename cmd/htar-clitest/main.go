@@ -35,15 +35,17 @@ func main() {
   }
   ascii.PrintPartitions(linear.MaxPartionSize, parts)
 
-  cmd := exec.Command("mbuffer", "-R", "10MB", "-o", "/dev/null")
-
-  cmd.SysProcAttr = &syscall.SysProcAttr{
-    // detach controlling terminal
-    Setsid: true,
+  getCommand := func() *exec.Cmd {
+    cmd := exec.Command("mbuffer", "-R", "10MB", "-o", "/dev/null")
+    cmd.SysProcAttr = &syscall.SysProcAttr{
+      // detach controlling terminal
+      Setsid: true,
+    }
+    return cmd
   }
 
   packer := &packer.PipePacker{
-    Command: cmd,
+    GetCommand: getCommand,
   }
 
   /*packer := &packer.FilePacker{

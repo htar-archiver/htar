@@ -16,7 +16,7 @@ import (
 )
 
 type PipePacker struct {
-  Command *exec.Cmd
+  GetCommand func() *exec.Cmd
   NextPartCallback func(int) bool
 }
 
@@ -43,14 +43,15 @@ func (a *PipePacker) writePipePart(fsys fs.FS, stderr io.Writer, part Partition)
   pipeReader, pipeWriter := io.Pipe()
 
   var errPipe error
-  fmt.Fprintf(stderr, "Start pipe: %v %v\n\n", a.Command.Path, a.Command.Args[1:])
+  cmd := a.GetCommand()
+  fmt.Fprintf(stderr, "Start pipe: %v %v\n\n", cmd.Path, cmd.Args[1:])
 
   lines := make(chan string)
   
   wg.Add(1)
   go func() {
     defer wg.Done()
-    errPipe = pipe.Run(a.Command, pipeReader, lines)
+    errPipe = pipe.Run(cmd, pipeReader, lines)
   }()
 
   pg := make(chan archive.ProgressUpdate)

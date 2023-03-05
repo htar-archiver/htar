@@ -54,15 +54,18 @@ func resolvePacker(opts Options) (packer.Packer, error) {
   }
   
   if opts.Pack.File.Name == "" && opts.Pack.Pipe.Cmd != "" {
+    cmd := func() *exec.Cmd {
+      return resolveCmd(opts.Pack.Pipe.Cmd, opts.Pack.Pipe.Attached)
+    }
     return &packer.PipePacker{
-      Command: resolveCmd(opts.Pack.Pipe.Cmd, opts.Pack.Pipe.Attached),
+      GetCommand: cmd,
     }, nil
   }
 
   return nil, errors.New("could not resolve packer")
 }
 
-func resolveCmd(command string, attach bool) (*exec.Cmd) {
+func resolveCmd(command string, attach bool) *exec.Cmd {
   str, err := strconv.Unquote(command)
   if err != nil {
     str = command

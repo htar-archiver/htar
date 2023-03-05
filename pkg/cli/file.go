@@ -5,6 +5,7 @@ import (
   "fmt"
   "io"
   "io/fs"
+  "math"
   "os"
   "strings"
   "sync"
@@ -26,7 +27,7 @@ func (a *FileArchiver) WritePartitions(fsys fs.FS, stdout io.Writer, parts []Par
 
   // create all output files
   for partIndex, _ := range parts {
-    name := a.getName(partIndex)
+    name := a.getName(partIndex, len(parts))
     file, err := os.Create(name)
     if err != nil {
       return err
@@ -67,11 +68,16 @@ func (a *FileArchiver) writePartition(fsys fs.FS, stdout io.Writer, part Partiti
   return err
 }
 
-func (a *FileArchiver) getName(partIndex int) string {
+func (a *FileArchiver) getName(partIndex int, partCount int) string {
+  if partIndex == 0 && partCount == 1 {
+    return a.Destination
+  }
   dir, file := path.Split(a.Destination)
   ext := path.Ext(file)
   base := strings.TrimSuffix(file, ext)
-  return path.Join(dir, fmt.Sprintf("%v_part%d%v", base, partIndex, ext))
+  digits := int(math.Floor(math.Log10(float64(partCount - 1))) + 1)
+  format := fmt.Sprintf("%%v_part%%0%dd%%v", digits)
+  return path.Join(dir, fmt.Sprintf(format, base, partIndex, ext))
 }
 
 func pathExists(path string) bool {

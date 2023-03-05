@@ -12,7 +12,10 @@ import (
 
 func TestName(t *testing.T) {
   archiver := &FileArchiver{ Destination: "my/dir/test.tar" }
-  assert.Equal(t, "my/dir/test_part42.tar" , archiver.getName(42))
+  assert.Equal(t, "my/dir/test.tar" , archiver.getName(0, 1))
+  assert.Equal(t, "my/dir/test_part42.tar" , archiver.getName(42, 50))
+  assert.Equal(t, "my/dir/test_part10.tar" , archiver.getName(10, 100))
+  assert.Equal(t, "my/dir/test_part010.tar" , archiver.getName(10, 101))
 }
 
 func TestCreateArchives(t *testing.T) {

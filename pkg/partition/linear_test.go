@@ -1,6 +1,8 @@
 package partition
 
 import (
+  . "htar/pkg/core"
+
   "testing"
   "github.com/stretchr/testify/assert"
 )
@@ -53,4 +55,12 @@ func TestFileTooLarge(t *testing.T) {
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, parts)
   assert.EqualError(t, err, "file \"/test2/b.bin\" (8.0 KB) is too large to fit in partition")
+}
+
+func TestNoFilesInSource(t *testing.T) {
+  groups := make([]FileGroup, 0)
+  linear := &LinearPartitioner{}
+  parts, err := linear.MakePartitions(groups)
+  assert.Nil(t, parts)
+  assert.EqualError(t, err, "no files in any source")
 }

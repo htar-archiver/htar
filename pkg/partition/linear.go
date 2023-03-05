@@ -1,6 +1,7 @@
 package partition
 
 import (
+  "errors"
   "fmt"
   "github.com/c2h5oh/datasize"
   . "htar/pkg/core"
@@ -15,6 +16,7 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
     parts := make([]Partition, 0)
     split := false
     part := Partition{}
+    empty := true
 
     for _, g := range groups {
 
@@ -25,6 +27,10 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
             g.Name, datasize.ByteSize(g.TotalSize).HumanReadable())
         }      
         split = true
+      }
+
+      if empty && len(g.Files) > 0 {
+        empty = false
       }
 
       var divides []FileGroup
@@ -63,6 +69,10 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
         part.TotalFiles += len(d.Files)
         part.TotalSize += d.TotalSize
       }
+    }
+
+    if empty {
+      return nil, errors.New("no files in any source")
     }
 
     parts = append(parts, part)

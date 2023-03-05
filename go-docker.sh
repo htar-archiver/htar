@@ -5,6 +5,9 @@ SOURCE_DIR=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 CONTAINER_NAME="htar-dev"
 
 if [[ $( docker container inspect -f "{{.State.Running}}" "${CONTAINER_NAME}" 2> /dev/null ) == "true" ]]; then
+  if [[ -z "$*" ]]; then
+    set -- "/bin/sh"
+  fi
   docker exec -it "${CONTAINER_NAME}" "$@"
   exit $?
 fi

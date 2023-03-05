@@ -41,5 +41,7 @@ func main() {
   for pg := range pgc {
     fmt.Printf("[%d/%d] %v\n", pg.CurrentFiles, pg.TotalFiles, pg.Path)
   }
-  fmt.Println(err)
+  if err != nil {
+    fmt.Println(err)
+  }
 }

@@ -19,9 +19,9 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
 	defer tw.Close()
 
   hashes := make(map[string][]byte, part.TotalFiles)
-  totalSize := uint64(part.TotalSize)
+  totalSize := part.TotalSize
   writtenFiles := int(0)
-  writtenBytes := uint64(0)
+  writtenBytes := int64(0)
 
   for _, group := range part.Groups {
     for _, file := range group.Files {
@@ -33,15 +33,15 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
       hashes[file.Path] = hash
 
       writtenFiles += 1
-      writtenBytes += uint64(written)
+      writtenBytes += int64(written)
 
       changed := written - int64(file.Size)
-      totalSize += uint64(changed)
+      totalSize += changed
       
       if progress != nil {
         progress <- ProgressUpdate{
           Path: file.Path,
-          FileSize: uint64(file.Size),
+          FileSize: file.Size,
           FileChangedSize: changed,
           CurrentFiles: writtenFiles,
           CurrentSize: writtenBytes,

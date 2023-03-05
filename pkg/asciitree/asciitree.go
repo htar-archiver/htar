@@ -14,9 +14,9 @@ type PrintOptions struct {
   FileCount int
 }
 
-func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize datasize.ByteSize, parts []Partition) {
+func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize int64, parts []Partition) {
   totalFiles := 0
-  totalSize := datasize.ByteSize(0)
+  totalSize := int64(0)
 
   for partIndex, part := range parts {
     partStr := fmt.Sprintf("Partition %d: %v, %d files",
@@ -40,7 +40,8 @@ func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize datasize.ByteSiz
             fmt.Fprintf(w, "%v ...\n", pad)
             break
           }
-          fmt.Fprintf(w, "%v %v (%v)\n", pad, basename(group.Name, file.Path), file.Size.HumanReadable())
+          fmt.Fprintf(w, "%v %v (%v)\n",
+            pad, basename(group.Name, file.Path), datasize.ByteSize(file.Size).HumanReadable())
         }
       }
     }
@@ -52,7 +53,7 @@ func (o *PrintOptions) PrintPartitions(w io.Writer, partionSize datasize.ByteSiz
   }
 
   fmt.Fprintf(w, "Total: %v, %d files in %d partitions\n",
-    getRelSize(totalSize, partionSize * datasize.ByteSize(len(parts))), totalFiles, len(parts))
+    getRelSize(totalSize, partionSize * int64(len(parts))), totalFiles, len(parts))
 }
 
 func min(a, b int) int {
@@ -69,17 +70,17 @@ func basename(parent string, child string) string {
   return strings.Trim(strings.TrimPrefix(child, parent), string(os.PathSeparator))
 }
 
-func getRelSize(value datasize.ByteSize, max datasize.ByteSize) string {
+func getRelSize(value int64, max int64) string {
   if max > 0 {
     percent := float64(value) / float64(max) * float64(100)
-    return fmt.Sprintf("%8v %2.0f%%", value.HumanReadable(), percent)
+    return fmt.Sprintf("%8v %2.0f%%", datasize.ByteSize(value).HumanReadable(), percent)
   }
-  return value.HumanReadable()
+  return datasize.ByteSize(value).HumanReadable()
 }
 
-func getAvgSize(value datasize.ByteSize, count int) string {
-  avg := value / datasize.ByteSize(count)
-  return fmt.Sprintf("⌀%v", avg.HumanReadable());
+func getAvgSize(value int64, count int) string {
+  avg := value / int64(count)
+  return fmt.Sprintf("⌀%v", datasize.ByteSize(avg).HumanReadable());
 }
 
 func (o *PrintOptions) getBullet(index int, len int) string {

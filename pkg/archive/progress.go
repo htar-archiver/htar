@@ -2,10 +2,10 @@ package archive
 
 type ProgressUpdate struct {
   Path string
-  FileSize uint64
+  FileSize int64
   FileChangedSize int64
   CurrentFiles int
-  CurrentSize uint64
+  CurrentSize int64
   TotalFiles int
-  TotalSize uint64
+  TotalSize int64
 }

@@ -4,7 +4,6 @@ import (
   "bytes"
   "testing"
   "testing/fstest"
-  "github.com/c2h5oh/datasize"
   "github.com/stretchr/testify/assert"
   . "htar/pkg/core"
 )
@@ -41,12 +40,12 @@ func TestWriteTarProgress(t *testing.T) {
 
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
-  assert.Equal(t, uint64(4), pg.FileSize)
+  assert.Equal(t, int64(4), pg.FileSize)
   assert.Equal(t, int64(0), pg.FileChangedSize)
   assert.Equal(t, 1, pg.CurrentFiles)
-  assert.Equal(t, uint64(4), pg.CurrentSize)
+  assert.Equal(t, int64(4), pg.CurrentSize)
   assert.Equal(t, 1, pg.TotalFiles)
-  assert.Equal(t, uint64(4), pg.TotalSize)
+  assert.Equal(t, int64(4), pg.TotalSize)
 }
 
 func TestWriteTarGrownFile(t *testing.T) {
@@ -59,12 +58,12 @@ func TestWriteTarGrownFile(t *testing.T) {
 
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
-  assert.Equal(t, uint64(4), pg.FileSize)
+  assert.Equal(t, int64(4), pg.FileSize)
   assert.Equal(t, int64(3), pg.FileChangedSize)
   assert.Equal(t, 1, pg.CurrentFiles)
-  assert.Equal(t, uint64(7), pg.CurrentSize)
+  assert.Equal(t, int64(7), pg.CurrentSize)
   assert.Equal(t, 1, pg.TotalFiles)
-  assert.Equal(t, uint64(7), pg.TotalSize)
+  assert.Equal(t, int64(7), pg.TotalSize)
 }
 
 func TestWriteTarShrinkedFile(t *testing.T) {
@@ -77,12 +76,12 @@ func TestWriteTarShrinkedFile(t *testing.T) {
 
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
-  assert.Equal(t, uint64(8), pg.FileSize)
+  assert.Equal(t, int64(8), pg.FileSize)
   assert.Equal(t, int64(-4), pg.FileChangedSize)
   assert.Equal(t, 1, pg.CurrentFiles)
-  assert.Equal(t, uint64(4), pg.CurrentSize)
+  assert.Equal(t, int64(4), pg.CurrentSize)
   assert.Equal(t, 1, pg.TotalFiles)
-  //assert.Equal(t, uint64(4), pg.TotalSize)
+  assert.Equal(t, int64(4), pg.TotalSize)
 }
 
 func singleFileFs(path string, data string) fstest.MapFS {
@@ -97,13 +96,13 @@ func singleFileFs(path string, data string) fstest.MapFS {
 func singleFilePart(path string, size int) Partition {
   return Partition {
     TotalFiles: 1,
-    TotalSize: datasize.ByteSize(size),
+    TotalSize: int64(size),
     Groups: []FileGroup {
       FileGroup {
         Name: path,
-        TotalSize: datasize.ByteSize(size),
+        TotalSize: int64(size),
         Files: []FileEntry {
-          {Path: path, Size: datasize.ByteSize(size)},
+          {Path: path, Size: int64(size)},
         },
       },
     },

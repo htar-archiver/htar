@@ -7,7 +7,7 @@ import (
 )
 
 type LinearPartitioner struct {
-  MaxPartionSize datasize.ByteSize
+  MaxPartionSize int64
   AllowSplit bool
 }
 
@@ -22,7 +22,7 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
         // requires splitting
         if !p.AllowSplit {
           return nil, fmt.Errorf("file group %q (%s) is too large to fit in partition without splitting",
-            g.Name, g.TotalSize.HumanReadable())
+            g.Name, datasize.ByteSize(g.TotalSize).HumanReadable())
         }      
         split = true
       }
@@ -39,7 +39,7 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
         for _, f := range g.Files {
           if f.Size > p.MaxPartionSize {
             return nil, fmt.Errorf("file %q (%s) is too large to fit in partition",
-              f.Path, f.Size.HumanReadable())
+              f.Path, datasize.ByteSize(f.Size).HumanReadable())
           }
           if divide.TotalSize + f.Size > remaining {
             // next divide

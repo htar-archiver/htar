@@ -2,7 +2,6 @@ package scanner
 
 import (
   "io/fs"
-  "github.com/c2h5oh/datasize"
   . "htar/pkg/core"
 )
 
@@ -17,7 +16,7 @@ func ScanDir(fsys fs.FS, root string) (*FileGroup, error) {
       if err != nil {
         return err
       }
-      entry := FileEntry{Path: path, Size: datasize.ByteSize(info.Size())}
+      entry := FileEntry{Path: path, Size: info.Size()}
       group.Files = append(group.Files, entry)
       group.TotalSize += entry.Size
     }

@@ -7,8 +7,12 @@ import (
   "sync"
 )
 
-func Run(cmd *exec.Cmd, stdinBuf io.Reader, outlines chan<- string) error {
+func Run(cmd *exec.Cmd, stdinBuf io.ReadCloser, outlines chan<- string) error {
   defer close(outlines)
+
+  if stdinBuf != nil {
+    defer stdinBuf.Close()
+  }
 
   stdin, err := cmd.StdinPipe()
   if err != nil {

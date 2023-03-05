@@ -66,8 +66,8 @@ func (a *PipePacker) writePipePart(fsys fs.FS, stderr io.Writer, part Partition)
 
   wg.Wait()
 
-  if err != nil {
-    return err
+  if errPipe != nil {
+    return errPipe
   }
-  return errPipe
+  return err
 }

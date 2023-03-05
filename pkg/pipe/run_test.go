@@ -1,6 +1,7 @@
 package pipe
 
 import (
+  "io"
   "strings"
   "os/exec"
   "testing"
@@ -39,7 +40,7 @@ func TestStdErr(t *testing.T) {
 
 func TestCat(t *testing.T) {
   cmd := exec.Command("/bin/cat")
-  in := strings.NewReader("Hello\nWorld\n")
+  in := io.NopCloser(strings.NewReader("Hello\nWorld\n"))
   out := make(chan string, 2)
 
   err := Run(cmd, in, out)

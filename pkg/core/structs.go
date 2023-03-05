@@ -1,19 +1,19 @@
 package core
 
 type Partition struct {
-  Groups []FileGroup
-  TotalFiles int
-  TotalSize int64
+  Groups []FileGroup `json:"groups"`
+  TotalFiles int `json:"totalFiles"`
+  TotalSize int64 `json:"totalSize"`
 }
 
 type FileGroup struct {
-  Files []FileEntry
-  Name string
-  TotalSize int64
+  Files []FileEntry `json:"files"`
+  Name string `json:"name"`
+  TotalSize int64 `json:"size"`
 }
 
 type FileEntry struct {
-  Path string
-  Size int64
-  Hash HexString
+  Path string `json:"path"`
+  Size int64 `json:"size"`
+  Hash HexString `json:"hash"`
 }

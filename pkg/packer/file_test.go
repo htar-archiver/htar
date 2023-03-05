@@ -37,7 +37,7 @@ func TestCreateArchives(t *testing.T) {
   assert.False(t, pathExists(dest[0]))
   assert.False(t, pathExists(dest[1]))
 
-  err := packer.WritePartitions(fs, parts)
+  err := packer.writeFileParts(fs, os.Stderr, parts)
   assert.Nil(t, err)
 
   assert.True(t, pathExists(dest[0]))
@@ -59,6 +59,6 @@ func TestDoNotOverwrite(t *testing.T) {
   assert.Nil(t, err)
   f.Close()
 
-  err = packer.WritePartitions(fs, parts)
+  err = packer.writeFileParts(fs, os.Stderr, parts)
   assert.Regexp(t, "file exists", err.Error())
 }

@@ -16,6 +16,7 @@ type Options struct {
     DryRun bool `long:"scan" description:"Only scan sources and print partitions."`
     PrintFileCount int `long:"print-count" default:"3" description:"Preview file count of partition tree."`
     Root string `short:"C" long:"root" default:"/" description:"Make paths relative."`
+    Protocol string `long:"protocol" description:"Save a copy of hashes outside the archive."`
     Part struct {
       MaxPartionSize DataSizeString `long:"size" description:"Max partition size."`
       AllowSplit bool `long:"split" description:"Allow splitting file groups into multiple partitions."`

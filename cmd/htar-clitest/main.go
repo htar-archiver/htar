@@ -44,15 +44,16 @@ func main() {
     return cmd
   }
 
-  packer := &packer.PipePacker{
+  p := &packer.PipePacker{
     GetCommand: getCommand,
   }
 
-  /*packer := &packer.FilePacker{
+  /*p := &packer.FilePacker{
     Destination: "test.tar",
   }*/
 
-  if err := packer.WritePartitions(fs, parts); err != nil {
+  bs := packer.NewBackupSet(parts)
+  if err := p.WritePartitions(fs, bs); err != nil {
     panic(err)
   }
 }

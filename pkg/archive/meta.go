@@ -14,21 +14,21 @@ var (
 
 type PartitionMeta struct {
   Version string `json:"_version"`
+  CreatedAt time.Time `json:"created_at"`
   TotalFiles int `json:"files"`
   TotalSize int64 `json:"size"`
-  CreatedAt time.Time `json:"created_at"`
 }
 
 func NewPartitionMeta(totalFiles int, totalSize int64) PartitionMeta {
   return PartitionMeta {
     Version: partMetaVersion,
+    CreatedAt: time.Now(),
     TotalFiles: totalFiles,
     TotalSize: totalSize,
-    CreatedAt: time.Now(),
   }
 }
 
-func (meta *PartitionMeta) Encode(writer io.Writer) error {
+func (meta PartitionMeta) Encode(writer io.Writer) error {
   enc := json.NewEncoder(writer)
   return enc.Encode(meta)
 }

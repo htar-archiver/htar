@@ -9,7 +9,11 @@ import (
   "htar/pkg/archive"
 )
 
-func verifyPartition(reader io.Reader) error {
+func VerifyPartition(reader io.Reader) error {
+  return verifyPartFile(os.Stderr, reader)
+}
+
+func verifyPartFile(stderr io.Writer, reader io.Reader) error {
   var wg sync.WaitGroup
   pgc := make(chan archive.ProgressUpdate)
 

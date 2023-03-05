@@ -18,11 +18,23 @@ import (
 )
 
 type FilePacker struct {
+  ProtocolFile string
   Destination string
 }
 
-func (a *FilePacker) WritePartitions(fsys fs.FS, parts []Partition) error {
-  return a.writeFileParts(fsys, os.Stderr, parts)
+func (a *FilePacker) WritePartitions(fsys fs.FS, backupSet BackupSet) error {
+  pw, err := NewProtocolWriter(a.ProtocolFile)
+  if err != nil {
+    return err
+  }
+  defer pw.Close()
+
+  err = a.writeFileParts(fsys, os.Stderr, backupSet.Partitions)
+  if err != nil {
+    return err
+  }
+
+  return pw.Write(backupSet)
 }
 
 func (a *FilePacker) writeFileParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {

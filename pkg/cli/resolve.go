@@ -49,6 +49,7 @@ func resolvePartitioner(opts Options) (partition.Partitioner, error) {
 func resolvePacker(opts Options) (packer.Packer, error) {
   if opts.Pack.File.Name != "" && opts.Pack.Pipe.Cmd == "" {
     return &packer.FilePacker{
+      ProtocolFile: opts.Pack.Protocol,
       Destination: opts.Pack.File.Name,
     }, nil
   }
@@ -58,6 +59,7 @@ func resolvePacker(opts Options) (packer.Packer, error) {
       return resolveCmd(opts.Pack.Pipe.Cmd, opts.Pack.Pipe.Attached)
     }
     return &packer.PipePacker{
+      ProtocolFile: opts.Pack.Protocol,
       GetCommand: cmd,
     }, nil
   }

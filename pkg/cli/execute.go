@@ -11,6 +11,7 @@ import (
   "htar/pkg/asciitree"
   "htar/pkg/color"
   "htar/pkg/scanner"
+  "htar/pkg/packer"
 )
 
 func Execute(args []string) error {
@@ -69,12 +70,13 @@ func executePack(opts Options) error {
   ascii.PrintPartitions(partitioner.GetMaxSize(), parts)
 
   if !opts.Pack.DryRun {
-    packer, err := resolvePacker(opts)
+    p, err := resolvePacker(opts)
     if err != nil {
       return err
     }
 
-    err = packer.WritePartitions(fsys, parts)
+    bs := packer.NewBackupSet(parts)
+    err = p.WritePartitions(fsys, bs)
     if err != nil {
       return err
     }
@@ -97,7 +99,7 @@ func executeVerify(opts Options) error {
 
     defer f.Close()
 
-    err = verifyPartition(f)
+    err = VerifyPartition(f)
 
     var msg string
     if err == nil {

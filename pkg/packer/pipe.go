@@ -16,12 +16,24 @@ import (
 )
 
 type PipePacker struct {
+  ProtocolFile string
   GetCommand func() *exec.Cmd
   NextPartCallback func(int) bool
 }
 
-func (a *PipePacker) WritePartitions(fsys fs.FS, parts []Partition) error {
-  return a.writePipeParts(fsys, os.Stderr, parts)
+func (a *PipePacker) WritePartitions(fsys fs.FS, backupSet BackupSet) error {
+  pw, err := NewProtocolWriter(a.ProtocolFile)
+  if err != nil {
+    return err
+  }
+  defer pw.Close()
+
+  err = a.writePipeParts(fsys, os.Stderr, backupSet.Partitions)
+  if err != nil {
+    return err
+  }
+
+  return pw.Write(backupSet)
 }
 
 func (a *PipePacker) writePipeParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {

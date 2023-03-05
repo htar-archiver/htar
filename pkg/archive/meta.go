@@ -8,39 +8,39 @@ import(
 )
 
 var (
-  metaVersion = "1"
-  metaFile = ".htar"
+  partMetaVersion = "1"
+  partMetaFile = ".htar"
 )
 
-type Meta struct {
+type PartitionMeta struct {
   Version string `json:"_version"`
   TotalFiles int `json:"files"`
   TotalSize int64 `json:"size"`
   CreatedAt time.Time `json:"created_at"`
 }
 
-func NewMeta(totalFiles int, totalSize int64) Meta {
-  return Meta {
-    Version: metaVersion,
+func NewPartitionMeta(totalFiles int, totalSize int64) PartitionMeta {
+  return PartitionMeta {
+    Version: partMetaVersion,
     TotalFiles: totalFiles,
     TotalSize: totalSize,
     CreatedAt: time.Now(),
   }
 }
 
-func (meta *Meta) Encode(writer io.Writer) error {
+func (meta *PartitionMeta) Encode(writer io.Writer) error {
   enc := json.NewEncoder(writer)
   return enc.Encode(meta)
 }
 
-func (meta *Meta) Decode(reader io.Reader) error {
+func (meta *PartitionMeta) Decode(reader io.Reader) error {
   dec := json.NewDecoder(reader)
   err := dec.Decode(&meta)
   if (err != nil) {
     return err
   }
-  if (meta.Version != metaVersion) {
-    return fmt.Errorf("expected meta data version %q but file contains %q", metaVersion, meta.Version)
+  if (meta.Version != partMetaVersion) {
+    return fmt.Errorf("expected meta data version %q but file contains %q", partMetaVersion, meta.Version)
   }
   return nil
 }

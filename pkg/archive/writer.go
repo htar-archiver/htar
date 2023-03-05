@@ -23,13 +23,13 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
   writtenFiles := int(0)
   writtenBytes := int64(0)
 
-  if _, hash, err := writeMeta(tw, part, metaFile); err != nil {
+  if _, hash, err := writePartitionMeta(tw, part, partMetaFile); err != nil {
     return fmt.Errorf("error writing meta file %v: ", err)
   } else {
-    hashes[metaFile] = hash
+    hashes[partMetaFile] = hash
     if progress != nil {
       progress <- ProgressUpdate{
-        Path: metaFile,
+        Path: partMetaFile,
         Hash: hash,
         TotalFiles: part.TotalFiles,
       }
@@ -97,8 +97,8 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
   return nil
 }
 
-func writeMeta(tw *tar.Writer, part Partition, path string) (int64, []byte, error) {
-  meta := NewMeta(part.TotalFiles, part.TotalSize)
+func writePartitionMeta(tw *tar.Writer, part Partition, path string) (int64, HexString, error) {
+  meta := NewPartitionMeta(part.TotalFiles, part.TotalSize)
 
   buf := new(bytes.Buffer)
   err := meta.Encode(buf)
@@ -109,7 +109,7 @@ func writeMeta(tw *tar.Writer, part Partition, path string) (int64, []byte, erro
   return writeBuffer(tw, buf, path)
 }
 
-func writeFile(tw *tar.Writer, fsys fs.FS, path string) (int64, []byte, error) {
+func writeFile(tw *tar.Writer, fsys fs.FS, path string) (int64, HexString, error) {
   fi, err := fs.Stat(fsys, path)
   if err != nil {
     return 0, nil, err
@@ -148,7 +148,7 @@ func writeFile(tw *tar.Writer, fsys fs.FS, path string) (int64, []byte, error) {
   return written, sha.Sum(nil), nil
 }
 
-func writeBuffer(tw *tar.Writer, content *bytes.Buffer, path string) (int64, []byte, error) {
+func writeBuffer(tw *tar.Writer, content *bytes.Buffer, path string) (int64, HexString, error) {
   header := &tar.Header{
     Name: path,
     Mode: 0644,

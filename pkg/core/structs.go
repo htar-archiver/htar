@@ -15,5 +15,5 @@ type FileGroup struct {
 type FileEntry struct {
   Path string
   Size int64
-  Hash []byte
+  Hash HexString
 }

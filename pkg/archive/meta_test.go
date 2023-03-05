@@ -8,7 +8,7 @@ import (
 
 func TestWrongVersion(t *testing.T) {
   json := strings.NewReader("{\"_version\":\"wrong\"}")
-  meta := &Meta{}
+  meta := &PartitionMeta{}
   
   err := meta.Decode(json)
   assert.NotNil(t, err)
@@ -17,7 +17,7 @@ func TestWrongVersion(t *testing.T) {
 
 func TestMissingVersion(t *testing.T) {
   json := strings.NewReader("{}")
-  meta := &Meta{}
+  meta := &PartitionMeta{}
   
   err := meta.Decode(json)
   assert.NotNil(t, err)

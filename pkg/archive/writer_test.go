@@ -2,7 +2,6 @@ package archive
 
 import (
   "bytes"
-  "fmt"
   "testing"
   "github.com/stretchr/testify/assert"
 
@@ -44,7 +43,7 @@ func TestUpdateStruct(t *testing.T) {
 
   f := part.Groups[0].Files[0]
   assert.Equal(t, 4, int(f.Size))
-  assert.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", fmt.Sprintf("%x", f.Hash))
+  assert.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", f.Hash.String())
 }
 
 func TestWriteTarProgress(t *testing.T) {
@@ -81,7 +80,7 @@ func TestHashOfHashes(t *testing.T) {
 
   pg := <- pgc
   assert.Equal(t, "test.txt", pg.Path)
-  assert.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", fmt.Sprintf("%x", pg.Hash))
+  assert.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", pg.Hash.String())
 
   pg = <- pgc
   assert.Equal(t, "SHA256SUMS", pg.Path)

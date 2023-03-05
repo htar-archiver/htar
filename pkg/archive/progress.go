@@ -2,11 +2,12 @@ package archive
 
 import (
   "fmt"
+  . "htar/pkg/core"
 )
 
 type ProgressUpdate struct {
   Path string
-  Hash []byte
+  Hash HexString
   FileSize int64
   FileChangedSize int64
   CurrentFiles int

@@ -8,6 +8,7 @@ import(
   "fmt"
   "io"
   "strings"
+  . "htar/pkg/core"
 )
 
 func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
@@ -20,7 +21,7 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
   hashes := make(map[string][]byte)
   var hashesBuf *bytes.Buffer
 
-  meta := Meta{}
+  meta := PartitionMeta{}
   readFiles := int(0)
   readBytes := int64(0)
 
@@ -39,7 +40,7 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
       var buf *bytes.Buffer
 
       switch header.Name {
-      case metaFile:
+      case partMetaFile:
         buf = new(bytes.Buffer)
       case hashesFile:
         hashesBuf = new(bytes.Buffer)
@@ -51,7 +52,7 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
         return fmt.Errorf("error reading file %q from archive: %v", header.Name, err)
       }
 
-      if header.Name == metaFile {
+      if header.Name == partMetaFile {
         if err := meta.Decode(buf); err != nil {
           return fmt.Errorf("error parsing meta file: %v", err)
         }
@@ -104,7 +105,7 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
   return nil
 }
 
-func readFile(tr *tar.Reader, content *bytes.Buffer) (int64, []byte, error) {
+func readFile(tr *tar.Reader, content *bytes.Buffer) (int64, HexString, error) {
   sha := sha256.New()
 
   var mr io.Writer

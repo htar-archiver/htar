@@ -3,10 +3,12 @@ package archive
 import(
   "archive/tar"
   "bytes"
-  "crypto/sha256"
   "fmt"
   "io"
   "io/fs"
+
+  "github.com/minio/sha256-simd"
+
   . "htar/pkg/core"
 )
 

@@ -1,4 +1,4 @@
-package htarcore
+package core
 
 import (
   "github.com/c2h5oh/datasize"

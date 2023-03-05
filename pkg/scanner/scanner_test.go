@@ -5,10 +5,12 @@ import (
   "github.com/stretchr/testify/assert"
 )
 
-func TestScannerLevel0(t *testing.T) {
+func TestScanner(t *testing.T) {
   fsys := makeTestFS()
-  config := SourcePath{Path:"var/pool"}
+  config := []SourcePath{{Path: "var/pool", GroupingLevel: 2}}
   result, err := ScanSource(fsys, config)
   assert.Nil(t, err)
-  assert.Nil(t, result)
+  assert.Equal(t, 2, len(result))
+  assert.Equal(t, "var/pool/data/Documents", result[0].Name)
+  assert.Equal(t, 28 * 1024, int(result[0].TotalSize))
 }

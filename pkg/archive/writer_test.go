@@ -31,6 +31,22 @@ func TestWriteTarFileNotFound(t *testing.T) {
   assert.Contains(t, err.Error(), "b.txt")
 }
 
+func TestUpdateStruct(t *testing.T) {
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
+  buf := new(bytes.Buffer)
+
+  err := WritePartition(fs, part, buf, nil)
+
+  assert.Nil(t, err)
+  assert.Equal(t, 4, int(part.TotalSize))
+  assert.Equal(t, 4, int(part.Groups[0].TotalSize))
+
+  f := part.Groups[0].Files[0]
+  assert.Equal(t, 4, int(f.Size))
+  assert.Equal(t, "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", fmt.Sprintf("%x", f.Hash))
+}
+
 func TestWriteTarProgress(t *testing.T) {
   fs := testdata.SingleFileFs("test.txt", "test")
   part := testdata.SingleFilePart("test.txt", len([]byte("test")))

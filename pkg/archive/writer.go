@@ -23,14 +23,19 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
   writtenFiles := int(0)
   writtenBytes := int64(0)
 
-  for _, group := range part.Groups {
-    for _, file := range group.Files {
+  for groupIndex := range part.Groups {
+    group := &part.Groups[groupIndex]
+
+    for fileIndex := range group.Files {
+      file := &group.Files[fileIndex]
+
       written, hash, err := writeFile(tw, fsys, file.Path)
       if err != nil {
         return fmt.Errorf("error appending file %q to archive: %v", file.Path, err)
       }
 
       hashes[file.Path] = hash
+      file.Hash = hash
 
       writtenFiles += 1
       writtenBytes += int64(written)
@@ -49,6 +54,12 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
           TotalFiles: part.TotalFiles,
           TotalSize: totalSize,
         }
+      }
+
+      if (changed != 0) {
+        file.Size += changed
+        group.TotalSize += changed
+        part.TotalSize += changed
       }
     }
   }

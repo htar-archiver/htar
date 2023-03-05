@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -euf -o pipefail
 
 SOURCE_DIR=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 CONTAINER_NAME="htar-dev"
@@ -9,6 +9,8 @@ if [[ $( docker container inspect -f "{{.State.Running}}" "${CONTAINER_NAME}" 2>
   exit $?
 fi
 
+docker build --tag "localhost/htar:builder" --file "${SOURCE_DIR}/ci/builder.Dockerfile" "${SOURCE_DIR}/ci/"
+
 docker run -it --rm \
   --user "$(id -u "${USER}"):$(id -g "${USER}")" \
   -e "GOCACHE=/tmp/go-cache" \
@@ -16,4 +18,4 @@ docker run -it --rm \
   -v "${SOURCE_DIR}:/go/src/htar" \
   -w "/go/src/htar" \
   --name "${CONTAINER_NAME}" \
-  golang:1.16-alpine "$@"
+  localhost/htar:builder "$@"

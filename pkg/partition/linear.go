@@ -50,6 +50,7 @@ func (p *LinearPartitioner) MakePartitions(groups []FileGroup) ([]Partition, err
           divide.Files = append(divide.Files, f)
           divide.TotalSize += f.Size
         }
+        divides = append(divides, divide)
       }
 
       for _, d := range divides {

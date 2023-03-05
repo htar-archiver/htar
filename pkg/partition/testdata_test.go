@@ -16,8 +16,9 @@ func makeTestGroups() []FileGroup {
       Files: []FileEntry {
         { Path: "/test2/a.bin", Size: 1024 },
         { Path: "/test2/b.bin", Size: 8192 },
+        { Path: "/test2/c.bin", Size: 8192 },
       },
-      TotalSize: 9216,
+      TotalSize: 17408,
     },
   };
 }

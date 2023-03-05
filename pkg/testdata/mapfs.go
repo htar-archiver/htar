@@ -32,6 +32,10 @@ func MakeTestFS() fstest.MapFS {
 		Mode: 0666,
     Data: makeFileBytes(11),
 	}
+  m["var/pool/data/Music/Artist/.empty"] = &fstest.MapFile{
+		Mode: 0666,
+    Data: makeFileBytes(0),
+	}
   m["var/pool/data/Music/Artist/Track01.mp3"] = &fstest.MapFile{
 		Mode: 0666,
     Data: makeFileBytes(120),
@@ -41,6 +45,14 @@ func MakeTestFS() fstest.MapFS {
     Data: makeFileBytes(50),
 	}
   m["var/pool/data/Music/Artist/Track03.mp3"] = &fstest.MapFile{
+		Mode: 0666,
+    Data: makeFileBytes(80),
+	}
+  m["var/pool/data/Music/Artist/Track04.mp3"] = &fstest.MapFile{
+		Mode: 0666,
+    Data: makeFileBytes(80),
+	}
+  m["var/pool/data/Music/Artist/Track05.mp3"] = &fstest.MapFile{
 		Mode: 0666,
     Data: makeFileBytes(80),
 	}

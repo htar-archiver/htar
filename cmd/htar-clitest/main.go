@@ -15,11 +15,14 @@ func main() {
   groups, _ := scanner.ScanSource(fs, sources)
 
   linear := &partition.LinearPartitioner{
-    MaxPartionSize: 10 * 1024 * 1024,
+    MaxPartionSize: 300 * 1024,
     AllowSplit: true,
   }
 
   parts, _ := linear.MakePartitions(groups)
 
-  asciitree.PrintPartitions(os.Stdout, parts)
+  ascii := &asciitree.PrintOptions{
+    FileCount: 3,
+  }
+  ascii.PrintPartitions(os.Stdout, linear.MaxPartionSize, parts)
 }

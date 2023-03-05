@@ -33,7 +33,11 @@ func htar() error {
     return err
   }
 
-  asciitree.PrintPartitions(os.Stdout, parts)
+  ascii := &asciitree.PrintOptions{
+    FileCount: 3,
+  }
+
+  ascii.PrintPartitions(os.Stdout, linear.MaxPartionSize, parts)
 
   return nil
 }

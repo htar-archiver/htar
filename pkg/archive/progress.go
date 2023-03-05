@@ -2,6 +2,7 @@ package archive
 
 import (
   "fmt"
+  "math"
   . "htar/pkg/core"
 )
 
@@ -34,6 +35,6 @@ func percent(value float64, max float64) string {
   if value < 0 || max < 1 {
     return "------"
   }
-  percent := value / max * float64(100)
+  percent := math.Floor(value / max * float64(1000)) / float64(10)
   return fmt.Sprintf("%5.1f%%", percent)
 }

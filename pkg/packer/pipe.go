@@ -15,16 +15,16 @@ import (
   . "htar/pkg/core"
 )
 
-type PipeArchiver struct {
+type PipePacker struct {
   Command *exec.Cmd
   NextPartCallback func(int) bool
 }
 
-func (a *PipeArchiver) WritePartitions(fsys fs.FS, parts []Partition) error {
+func (a *PipePacker) WritePartitions(fsys fs.FS, parts []Partition) error {
   return a.writePipeParts(fsys, os.Stderr, parts)
 }
 
-func (a *PipeArchiver) writePipeParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {
+func (a *PipePacker) writePipeParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {
   for partIndex, part := range parts {
     if a.NextPartCallback != nil && a.NextPartCallback(partIndex) {
       return fmt.Errorf("aborted writing partition #%d", partIndex)
@@ -38,7 +38,7 @@ func (a *PipeArchiver) writePipeParts(fsys fs.FS, stderr io.Writer, parts []Part
   return nil
 }
 
-func (a *PipeArchiver) writePipePart(fsys fs.FS, stderr io.Writer, part Partition) error {
+func (a *PipePacker) writePipePart(fsys fs.FS, stderr io.Writer, part Partition) error {
   var wg sync.WaitGroup
   pipeReader, pipeWriter := io.Pipe()
 

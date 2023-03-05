@@ -1,6 +1,9 @@
 package main
 
 import (
+  "os/exec"
+  "syscall"
+
   "htar/pkg/asciitree"
   "htar/pkg/partition"
   "htar/pkg/scanner"
@@ -32,11 +35,18 @@ func main() {
   }
   ascii.PrintPartitions(linear.MaxPartionSize, parts)
 
-  packer := &packer.PipeArchiver{
-    Command: "mbuffer -R 10mb -o /dev/null",
+  cmd := exec.Command("mbuffer", "-R", "10MB", "-o", "/dev/null")
+
+  cmd.SysProcAttr = &syscall.SysProcAttr{
+    // detach controlling terminal
+    Setsid: true,
   }
 
-  /*packer := &packer.FileArchiver{
+  packer := &packer.PipePacker{
+    Command: cmd,
+  }
+
+  /*packer := &packer.FilePacker{
     Destination: "test.tar",
   }*/
 

@@ -11,11 +11,11 @@ import (
 )
 
 func TestName(t *testing.T) {
-  archiver := &FileArchiver{ Destination: "my/dir/test.tar" }
-  assert.Equal(t, "my/dir/test.tar" , archiver.getName(0, 1))
-  assert.Equal(t, "my/dir/test_part42.tar" , archiver.getName(42, 50))
-  assert.Equal(t, "my/dir/test_part10.tar" , archiver.getName(10, 100))
-  assert.Equal(t, "my/dir/test_part010.tar" , archiver.getName(10, 101))
+  packer := &FilePacker{ Destination: "my/dir/test.tar" }
+  assert.Equal(t, "my/dir/test.tar" , packer.getName(0, 1))
+  assert.Equal(t, "my/dir/test_part42.tar" , packer.getName(42, 50))
+  assert.Equal(t, "my/dir/test_part10.tar" , packer.getName(10, 100))
+  assert.Equal(t, "my/dir/test_part010.tar" , packer.getName(10, 101))
 }
 
 func TestCreateArchives(t *testing.T) {
@@ -25,7 +25,7 @@ func TestCreateArchives(t *testing.T) {
   part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   parts := []Partition{part, part}
 
-  archiver := FileArchiver{
+  packer := FilePacker{
     Destination: path.Join(tmpDir, "test.tar"),
   }
 
@@ -37,7 +37,7 @@ func TestCreateArchives(t *testing.T) {
   assert.False(t, pathExists(dest[0]))
   assert.False(t, pathExists(dest[1]))
 
-  err := archiver.WritePartitions(fs, parts)
+  err := packer.WritePartitions(fs, parts)
   assert.Nil(t, err)
 
   assert.True(t, pathExists(dest[0]))
@@ -51,14 +51,14 @@ func TestDoNotOverwrite(t *testing.T) {
   part := testdata.SingleFilePart("test.txt", len([]byte("test")))
   parts := []Partition{part}
 
-  archiver := FileArchiver{
+  packer := FilePacker{
     Destination: path.Join(tmpDir, "test.tar"),
   }
 
-  f, err := os.Create(archiver.Destination)
+  f, err := os.Create(packer.Destination)
   assert.Nil(t, err)
   f.Close()
 
-  err = archiver.WritePartitions(fs, parts)
+  err = packer.WritePartitions(fs, parts)
   assert.Regexp(t, "file exists", err.Error())
 }

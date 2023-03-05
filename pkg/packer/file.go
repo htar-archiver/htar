@@ -17,15 +17,15 @@ import (
   . "htar/pkg/core"
 )
 
-type FileArchiver struct {
+type FilePacker struct {
   Destination string
 }
 
-func (a *FileArchiver) WritePartitions(fsys fs.FS, parts []Partition) error {
+func (a *FilePacker) WritePartitions(fsys fs.FS, parts []Partition) error {
   return a.writeFileParts(fsys, os.Stderr, parts)
 }
 
-func (a *FileArchiver) writeFileParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {
+func (a *FilePacker) writeFileParts(fsys fs.FS, stderr io.Writer, parts []Partition) error {
   names := make([]string, len(parts))
   files := make([]*os.File, len(parts))
 
@@ -56,7 +56,7 @@ func (a *FileArchiver) writeFileParts(fsys fs.FS, stderr io.Writer, parts []Part
   return nil
 }
 
-func (a *FileArchiver) writeFilePart(fsys fs.FS, stderr io.Writer, part Partition, dest io.Writer) error {
+func (a *FilePacker) writeFilePart(fsys fs.FS, stderr io.Writer, part Partition, dest io.Writer) error {
   pg := make(chan archive.ProgressUpdate)
 
   var wg sync.WaitGroup
@@ -72,7 +72,7 @@ func (a *FileArchiver) writeFilePart(fsys fs.FS, stderr io.Writer, part Partitio
   return err
 }
 
-func (a *FileArchiver) getName(partIndex int, partCount int) string {
+func (a *FilePacker) getName(partIndex int, partCount int) string {
   if partIndex == 0 && partCount == 1 {
     return a.Destination
   }

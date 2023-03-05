@@ -2,7 +2,6 @@ package partition
 
 import (
   "testing"
-  "reflect"
   "github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +12,7 @@ func TestMakeSinglePartition(t *testing.T) {
   assert.Nil(t, err)
   assert.Equal(t, 1, len(parts))
   assert.Equal(t, 6, parts[0].TotalFiles)
-  assert.True(t, reflect.DeepEqual(parts[0].Groups, groups))
+  assert.Equal(t, parts[0].Groups, groups)
 }
 
 func TestMakePartitions(t *testing.T) {
@@ -22,8 +21,8 @@ func TestMakePartitions(t *testing.T) {
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, err)
   assert.Equal(t, 2, len(parts))
-  assert.True(t, reflect.DeepEqual(parts[0].Groups[0], groups[0]))
-  assert.True(t, reflect.DeepEqual(parts[1].Groups[0], groups[1]))
+  assert.Equal(t, parts[0].Groups[0], groups[0])
+  assert.Equal(t, parts[1].Groups[0], groups[1])
 }
 
 func TestMakePartitionsAllowSplit(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 
 func TestMakeSinglePartition(t *testing.T) {
   groups := makeTestGroups()
-  linear := &LinearPartitioner{MaxPartionSize: 99999}
+  linear := &LinearPartitioner{Attributes: Attributes{MaxPartionSize: 99999}}
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, err)
   assert.Equal(t, 1, len(parts))
@@ -17,7 +17,7 @@ func TestMakeSinglePartition(t *testing.T) {
 
 func TestMakePartitions(t *testing.T) {
   groups := makeTestGroups()
-  linear := &LinearPartitioner{MaxPartionSize: 20480}
+  linear := &LinearPartitioner{Attributes: Attributes{MaxPartionSize: 20480}}
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, err)
   assert.Equal(t, 2, len(parts))
@@ -27,7 +27,7 @@ func TestMakePartitions(t *testing.T) {
 
 func TestMakePartitionsAllowSplit(t *testing.T) {
   groups := makeTestGroups()
-  linear := &LinearPartitioner{MaxPartionSize: 16384, AllowSplit: true}
+  linear := &LinearPartitioner{Attributes: Attributes{MaxPartionSize: 16384}, AllowSplit: true}
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, err)
   assert.Equal(t, 2, len(parts))
@@ -41,7 +41,7 @@ func TestMakePartitionsAllowSplit(t *testing.T) {
 
 func TestGroupTooLarge(t *testing.T) {
   groups := makeTestGroups()
-  linear := &LinearPartitioner{MaxPartionSize: 4096}
+  linear := &LinearPartitioner{Attributes: Attributes{MaxPartionSize: 4096}}
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, parts)
   assert.EqualError(t, err, "file group \"Test2\" (17.0 KB) is too large to fit in partition without splitting")
@@ -49,7 +49,7 @@ func TestGroupTooLarge(t *testing.T) {
 
 func TestFileTooLarge(t *testing.T) {
   groups := makeTestGroups()
-  linear := &LinearPartitioner{MaxPartionSize: 4096, AllowSplit: true}
+  linear := &LinearPartitioner{Attributes: Attributes{MaxPartionSize: 4096}, AllowSplit: true}
   parts, err := linear.MakePartitions(groups)
   assert.Nil(t, parts)
   assert.EqualError(t, err, "file \"/test2/b.bin\" (8.0 KB) is too large to fit in partition")

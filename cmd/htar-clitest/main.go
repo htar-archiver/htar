@@ -19,7 +19,7 @@ func main() {
   }
 
   linear := &partition.LinearPartitioner{
-    MaxPartionSize: 300 * 1024,
+    Attributes: partition.Attributes{ MaxPartionSize: 300 * 1024 },
     AllowSplit: true,
   }
 

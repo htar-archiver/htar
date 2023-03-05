@@ -36,7 +36,7 @@ func htar() error {
       return err
     }
   
-    config.AsciiTree.PrintPartitions(0, parts)
+    config.AsciiTree.PrintPartitions(config.Partitioner.GetMaxSize(), parts)
 
     if config.Command == cli.Archive {
       if err := config.Packer.WritePartitions(fsys, parts); err != nil {

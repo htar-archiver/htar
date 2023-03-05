@@ -7,7 +7,7 @@ import (
 )
 
 type LinearPartitioner struct {
-  MaxPartionSize int64
+  Attributes
   AllowSplit bool
 }
 

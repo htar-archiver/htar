@@ -8,7 +8,8 @@ import (
 
 func TestScanDir(t *testing.T) {
   fsys := testdata.MakeTestFS()
-  result, err := ScanDir(fsys, "var/pool/data/Documents")
+  scanner := &Scanner{}
+  result, err := scanner.ScanDir(fsys, "var/pool/data/Documents")
   assert.Nil(t, err)
   assert.Equal(t, 28 * 1024, int(result.TotalSize))
   assert.Equal(t, 4, len(result.Files))

@@ -2,10 +2,11 @@ package scanner
 
 import (
   "io/fs"
+  "sync/atomic"
   . "htar/pkg/core"
 )
 
-func ScanDir(fsys fs.FS, root string) (*FileGroup, error) {
+func (sc *Scanner) ScanDir(fsys fs.FS, root string) (*FileGroup, error) {
   group := &FileGroup{Name:root}
   err := fs.WalkDir(fsys, root, func(path string, d fs.DirEntry, err error) error {
     if err != nil {
@@ -16,9 +17,14 @@ func ScanDir(fsys fs.FS, root string) (*FileGroup, error) {
       if err != nil {
         return err
       }
+
       entry := FileEntry{Path: path, Size: info.Size()}
       group.Files = append(group.Files, entry)
       group.TotalSize += entry.Size
+
+      // report scanning progress
+      atomic.AddInt32(&sc.files, 1)
+      atomic.AddInt64(&sc.size, entry.Size)
     }
     return nil
   })

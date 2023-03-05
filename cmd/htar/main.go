@@ -18,6 +18,7 @@ func main() {
 
 func htar() error {
   sources := []scanner.SourcePath{{Path: ".", GroupingLevel: 1}}
+  scanner := &scanner.Scanner{}
   groups, err := scanner.ScanSource(os.DirFS("."), sources)
   if err != nil {
     return err

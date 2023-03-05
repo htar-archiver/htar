@@ -5,14 +5,14 @@ import (
   "fmt"
   "io"
   "io/fs"
-  "math"
   "os"
   "strings"
   "sync"
   "path"
 
-  "htar/pkg/color"
   "htar/pkg/archive"
+  "htar/pkg/color"
+  "htar/pkg/util"
 
   . "htar/pkg/core"
 )
@@ -91,7 +91,7 @@ func (a *FilePacker) getName(partIndex int, partCount int) string {
   dir, file := path.Split(a.Destination)
   ext := path.Ext(file)
   base := strings.TrimSuffix(file, ext)
-  digits := int(math.Floor(math.Log10(float64(partCount - 1))) + 1)
+  digits := util.Digits(partCount - 1)
   format := fmt.Sprintf("%%v_part%%0%dd%%v", digits)
   return path.Join(dir, fmt.Sprintf(format, base, partIndex, ext))
 }

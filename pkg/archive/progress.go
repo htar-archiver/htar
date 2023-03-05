@@ -3,6 +3,9 @@ package archive
 import (
   "fmt"
   "math"
+
+  "htar/pkg/util"
+
   . "htar/pkg/core"
 )
 
@@ -20,7 +23,9 @@ type ProgressUpdate struct {
 func (pg ProgressUpdate) String() string {
   percent := percent(float64(pg.CurrentSize), float64(pg.TotalSize))
   hash := shortHash(pg.Hash)
-  return fmt.Sprintf("[%d/%d] %v %v %v", pg.CurrentFiles, pg.TotalFiles, percent, hash, pg.Path)
+  digits := util.Digits(pg.TotalFiles)
+  format := fmt.Sprintf("[%%%dd/%%d] %%v %%v %%v", digits)
+  return fmt.Sprintf(format, pg.CurrentFiles, pg.TotalFiles, percent, hash, pg.Path)
 }
 
 func shortHash(hash []byte) string {

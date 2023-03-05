@@ -80,7 +80,6 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
         }
         if (buf != nil) {
           pg.CurrentFiles = 0
-          pg.TotalFiles = 0
           pg.TotalSize = 0
         }
         progress <- pg

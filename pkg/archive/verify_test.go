@@ -1,6 +1,7 @@
 package archive
 
 import (
+  "archive/tar"
   "bytes"
   "testing"
   "github.com/stretchr/testify/assert"
@@ -54,4 +55,13 @@ func TestVerifyPartitionFailure(t *testing.T) {
   err = VerifyPartition(bytes.NewBuffer(patch), nil)
   assert.NotNil(t, err)
   assert.Regexp(t, "^1 computed checksum did NOT match.*", err.Error())
+}
+
+func TestVerifyNoChecksums(t *testing.T) {
+  buf := new(bytes.Buffer)
+  tw := tar.NewWriter(buf)
+  tw.Close()
+
+  err := VerifyPartition(buf, nil)
+  assert.Equal(t, "archive does not contain checksums file", err.Error())
 }

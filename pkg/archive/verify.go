@@ -4,6 +4,7 @@ import(
   "archive/tar"
   "bytes"
   "crypto/sha256"
+  "errors"
   "fmt"
   "io"
   "strings"
@@ -17,7 +18,7 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
   tr := tar.NewReader(reader)
 
   hashes := make(map[string][]byte)
-  hashesFile := new(bytes.Buffer)
+  var hashesFile *bytes.Buffer
 
   readFiles := int(0)
   readBytes := int64(0)
@@ -36,6 +37,7 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
     if (header.Typeflag == tar.TypeReg) {
       var buf *bytes.Buffer
       if header.Name == "SHA256SUMS" {
+        hashesFile = new(bytes.Buffer)
         buf = hashesFile
       }
 
@@ -61,6 +63,10 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
         }
       }
     }
+  }
+
+  if hashesFile == nil {
+    return errors.New("archive does not contain checksums file")
   }
 
   expected, err := DecodeHashes(hashesFile)

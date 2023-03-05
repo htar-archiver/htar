@@ -29,3 +29,13 @@ func TestReadLevel3(t *testing.T) {
   assert.Equal(t, "var/pool/data/Documents", result[0])
   assert.Equal(t, "var/pool/data/Music", result[1])
 }
+
+func TestReadWithFiles(t *testing.T) {
+  fsys := makeTestFS()
+  result, err := ReadLevel(fsys, "var/pool/data/Documents", 1);
+  assert.Nil(t, err)
+  assert.Equal(t, 3, len(result))
+  assert.Equal(t, "var/pool/data/Documents/2020", result[0])
+  assert.Equal(t, "var/pool/data/Documents/2021", result[1])
+  assert.Equal(t, "var/pool/data/Documents/Notes.txt", result[2])
+}

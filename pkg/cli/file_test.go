@@ -43,3 +43,22 @@ func TestCreateArchives(t *testing.T) {
   assert.True(t, pathExists(dest[0]))
   assert.True(t, pathExists(dest[1]))
 }
+
+func TestDoNotOverwrite(t *testing.T) {
+  tmpDir := t.TempDir()
+
+  fs := testdata.SingleFileFs("test.txt", "test")
+  part := testdata.SingleFilePart("test.txt", len([]byte("test")))
+  parts := []Partition{part}
+
+  archiver := FileArchiver{
+    Destination: path.Join(tmpDir, "test.tar"),
+  }
+
+  f, err := os.Create(archiver.Destination)
+  assert.Nil(t, err)
+  f.Close()
+
+  err = archiver.WritePartitions(fs, os.Stdout, parts)
+  assert.Regexp(t, "file exists", err.Error())
+}

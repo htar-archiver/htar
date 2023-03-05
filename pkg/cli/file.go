@@ -28,7 +28,7 @@ func (a *FileArchiver) WritePartitions(fsys fs.FS, stdout io.Writer, parts []Par
   // create all output files
   for partIndex, _ := range parts {
     name := a.getName(partIndex, len(parts))
-    file, err := os.Create(name)
+    file, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
     if err != nil {
       return err
     }

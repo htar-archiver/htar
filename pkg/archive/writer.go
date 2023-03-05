@@ -58,8 +58,15 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
     return fmt.Errorf("error creating checksum file %v: ", err)
   }
 
-  if _, _, err := writeBuffer(tw, buf, "SHA256SUMS"); err != nil {
+  if _, hash, err := writeBuffer(tw, buf, "SHA256SUMS"); err != nil {
     return fmt.Errorf("error writing checksum file %v: ", err)
+  } else {
+    if progress != nil {
+      progress <- ProgressUpdate{
+        Path: "SHA256SUMS",
+        Hash: hash,
+      }
+    }
   }
 
   return nil

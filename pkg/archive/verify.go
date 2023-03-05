@@ -18,8 +18,9 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
   tr := tar.NewReader(reader)
 
   hashes := make(map[string][]byte)
-  var hashesFile *bytes.Buffer
+  var hashesBuf *bytes.Buffer
 
+  meta := Meta{}
   readFiles := int(0)
   readBytes := int64(0)
 
@@ -36,11 +37,13 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
 
     if (header.Typeflag == tar.TypeReg) {
       var buf *bytes.Buffer
-      if header.Name == "SHA256SUMS" {
-        hashesFile = new(bytes.Buffer)
-        buf = hashesFile
-      } else if header.Name == ".htar" {
+
+      switch header.Name {
+      case metaFile:
         buf = new(bytes.Buffer)
+      case hashesFile:
+        hashesBuf = new(bytes.Buffer)
+        buf = hashesBuf
       }
 
       read, hash, err := readFile(tr, buf)
@@ -48,7 +51,13 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
         return fmt.Errorf("error reading file %q from archive: %v", header.Name, err)
       }
 
-      if header.Name != "SHA256SUMS" {
+      if header.Name == metaFile {
+        if err := meta.Decode(buf); err != nil {
+          return fmt.Errorf("error parsing meta file: %v", err)
+        }
+      }
+
+      if header.Name != hashesFile {
         hashes[header.Name] = hash
       }
 
@@ -59,22 +68,29 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
       }
 
       if progress != nil {
-        progress <- ProgressUpdate{
+        pg := ProgressUpdate{
           Path: header.Name,
           Hash: hash,
           FileSize: read,
           CurrentFiles: readFiles,
           CurrentSize: readBytes,
+          TotalFiles: meta.TotalFiles,
+          TotalSize: meta.TotalSize,
         }
+        if (buf != nil) {
+          pg.CurrentFiles = 0
+          pg.TotalFiles = 0
+        }
+        progress <- pg
       }
     }
   }
 
-  if hashesFile == nil {
+  if hashesBuf == nil {
     return errors.New("archive does not contain checksums file")
   }
 
-  expected, err := DecodeHashes(hashesFile)
+  expected, err := DecodeHashes(hashesBuf)
   if err != nil {
     return fmt.Errorf("error parsing checksum file: %v", err)
   }

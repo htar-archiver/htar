@@ -18,7 +18,7 @@ func verifyPartition(reader io.Reader) error {
     defer wg.Done()
     for {
       if pg, ok := <- pgc; ok {
-        fmt.Fprintf(os.Stderr, "[%d/%d] %v\n", pg.CurrentFiles, pg.TotalFiles, pg.Path)
+        fmt.Fprintf(os.Stderr, "%v\n", pg)
       } else {
         break
       }

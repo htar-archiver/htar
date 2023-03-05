@@ -8,6 +8,8 @@ import(
   "strings"
 )
 
+var hashesFile = "SHA256SUMS"
+
 type Hashes map[string][]byte
 
 func EncodeHashes(hashes Hashes, writer io.Writer) error {

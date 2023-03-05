@@ -1,18 +1,8 @@
 package pipe
 
 import (
-  "bufio"
   "bytes"
-  "io"
 )
-
-func readPipe(r io.Reader, lines chan<- string) {
-  scanner := bufio.NewScanner(r)
-  scanner.Split(scanPtyLines)
-  for scanner.Scan() {
-    lines <- scanner.Text()
-  }
-}
 
 func scanPtyLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {

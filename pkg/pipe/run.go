@@ -1,18 +1,24 @@
 package pipe
 
 import (
+  "bufio"
   "io"
   "os/exec"
   "sync"
   "syscall"
 )
 
-func Run(cmd *exec.Cmd, stdin io.Reader, outlines chan<- string) error {
+func Run(cmd *exec.Cmd, stdinBuf io.Reader, outlines chan<- string) error {
   defer close(outlines)
 
   cmd.SysProcAttr = &syscall.SysProcAttr{
     // Detach controlling terminal
     Setsid: true,
+  }
+
+  stdin, err := cmd.StdinPipe()
+  if err != nil {
+    return err
   }
 
   stdout, err := cmd.StdoutPipe()
@@ -44,5 +50,21 @@ func Run(cmd *exec.Cmd, stdin io.Reader, outlines chan<- string) error {
   }
 
   defer wg.Wait()
+
+  if (stdinBuf != nil) {
+    if _, err := io.Copy(stdin, stdinBuf); err != nil {
+      return err
+    }
+  }
+
+  stdin.Close()
   return cmd.Wait()
+}
+
+func readPipe(r io.Reader, lines chan<- string) {
+  scanner := bufio.NewScanner(r)
+  scanner.Split(scanPtyLines)
+  for scanner.Scan() {
+    lines <- scanner.Text()
+  }
 }

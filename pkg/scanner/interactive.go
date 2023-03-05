@@ -6,7 +6,6 @@ import (
   "os"
   "io/fs"
   "strings"
-  "sync"
   "time"
 
   "github.com/c2h5oh/datasize"
@@ -19,9 +18,6 @@ func ScanSourcesWithProgress(fsys fs.FS, sources []SourcePath) ([]FileGroup, err
 }
 
 func scanInteractive(fsys fs.FS, stderr io.Writer, sources []SourcePath) ([]FileGroup, error) {
-  var wg sync.WaitGroup
-  defer wg.Wait()
-
   done := make(chan bool)
   defer close(done)
 
@@ -36,23 +32,33 @@ func scanInteractive(fsys fs.FS, stderr io.Writer, sources []SourcePath) ([]File
 }
 
 func reportProgress(stderr io.Writer, scanner *Scanner, done chan bool) {
-  line := "Scanning sources"
-  lastLen := len(line)
+  lastLen := 0
 
-  fmt.Fprintf(stderr, line)
+  print := func() {
+    files, size := scanner.GetProgress()
 
-  for {
+    line := fmt.Sprintf("Scanning sources: %d (%v) files discovered",
+      files, datasize.ByteSize(size).HumanReadable())
+
+    pad := makeSpaces(lastLen - len(line))
+
+    fmt.Fprintf(stderr, "\r%v%v",line, pad)
+    lastLen = len(line)
+  }
+
+  // immediately print once 
+  print()
+
+  for exit := false; exit == false; {
     select {
     case <- done:
-      break
+      // print latest
+      print()
+      exit = true
 
     case <-time.After(250 * time.Millisecond):
-      files, size := scanner.GetProgress()
-      line = fmt.Sprintf("Scanning sources: %d files, %v discovered",
-        files, datasize.ByteSize(size).HumanReadable())
-      fmt.Fprintf(stderr, "\r%v%v",
-        line, makeSpaces(lastLen - len(line)))
-      lastLen = len(line)
+      // periodic update
+      print()
     }
   }
 

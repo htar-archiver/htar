@@ -12,8 +12,7 @@ func main() {
   fs := testdata.MakeTestFS();
 
   sources := []scanner.SourcePath{{Path: "var/pool/data", GroupingLevel: 2}}
-  scanner := &scanner.Scanner{}
-  groups, err := scanner.ScanSources(fs, sources)
+  groups, err := scanner.ScanSourcesWithProgress(fs, sources)
   if err != nil {
     panic(err)
   }

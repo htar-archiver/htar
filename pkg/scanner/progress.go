@@ -62,7 +62,7 @@ func reportProgress(stderr io.Writer, scanner *Scanner, done chan bool) {
     }
   }
 
-  fmt.Fprint(stderr, "\n")
+  fmt.Fprint(stderr, "\n\n")
   if done != nil {
     done <- true
   }

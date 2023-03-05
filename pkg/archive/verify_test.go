@@ -25,7 +25,7 @@ func TestVerifyPartition(t *testing.T) {
   // meta data file
   pg := <- pgc
   assert.Equal(t, 0, pg.CurrentFiles)
-  assert.Equal(t, 0, pg.TotalFiles)
+  assert.Equal(t, int64(0), pg.TotalSize)
 
   pg = <- pgc
   assert.Equal(t, "test.txt", pg.Path)

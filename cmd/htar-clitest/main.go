@@ -34,8 +34,12 @@ func main() {
   }
   ascii.PrintPartitions(os.Stdout, linear.MaxPartionSize, parts)
 
-  archiver := &cli.PipeArchiver{
+  /*archiver := &cli.PipeArchiver{
     Command: "mbuffer -R 10mb -o /dev/null",
+  }*/
+
+  archiver := &cli.FileArchiver{
+    Destination: "test.tar",
   }
 
   if err := archiver.WritePartitions(fs, os.Stdout, parts); err != nil {

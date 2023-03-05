@@ -28,6 +28,15 @@ func TestEcho(t *testing.T) {
   assert.Equal(t, "Hello World\n", <- out)
 }
 
+func TestStdErr(t *testing.T) {
+  cmd := exec.Command("/bin/sh", "-c", "echo Hello World >&2")
+  out := make(chan string, 1)
+
+  err := Run(cmd, nil, out)
+  assert.Nil(t, err)
+  assert.Equal(t, "Hello World\n", <- out)
+}
+
 func TestCat(t *testing.T) {
   cmd := exec.Command("/bin/cat")
   in := strings.NewReader("Hello\nWorld\n")

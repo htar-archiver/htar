@@ -2,12 +2,14 @@ package cli
 
 import (
   "errors"
+  "fmt"
   "os"
   "path/filepath"
 
   "github.com/jessevdk/go-flags"
 
   "htar/pkg/asciitree"
+  "htar/pkg/color"
   "htar/pkg/scanner"
 )
 
@@ -22,6 +24,8 @@ func Execute(args []string) error {
   switch parser.Active.Name {
   case "pack":
     return executePack(opts)
+  case "verify":
+    return executeVerify(opts)
   default:
     return errors.New("command not implemented")
   }
@@ -76,5 +80,38 @@ func executePack(opts Options) error {
     }
   }
 
+  return nil
+}
+
+
+func executeVerify(opts Options) error {
+  hasError := false
+  for _, file := range opts.Verify.Positional.Files {
+    caption := color.Partition.Sprintf("Verify archive %q", file)
+    fmt.Fprintf(os.Stderr, "%v\n", caption)
+
+    f, err := os.Open(file)
+    if err != nil {
+      return err
+    }
+
+    defer f.Close()
+
+    err = verifyPartition(f)
+
+    var msg string
+    if err == nil {
+      msg = color.ArchiveValid.Sprintf("Verified archive %q successfully. All checksums match.", file)
+    } else {
+      hasError = true
+      msg = color.Error.Sprintf("Failed to verify archive %q: %s", file, err)
+    }
+
+    fmt.Fprintf(os.Stderr, "\n%v\n\n", msg)
+  }
+
+  if hasError {
+    return errors.New("one or more archives are corrupted")
+  }
   return nil
 }

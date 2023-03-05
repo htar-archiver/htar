@@ -11,7 +11,9 @@ import(
 )
 
 func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan ProgressUpdate) error {
-  defer close(progress)
+  if progress != nil {
+    defer close(progress)
+  }
 
   tw := tar.NewWriter(writer)
 	defer tw.Close()

@@ -1,6 +1,5 @@
 package archive
 
-
 import (
   "bytes"
   "testing"
@@ -47,7 +46,7 @@ func TestInvalid(t *testing.T) {
 
   hashes, err := DecodeHashes(buf)
   assert.Nil(t, hashes)
-  assert.EqualError(t, err, "error decoding line 2")
+  assert.EqualError(t, err, "line 2 improperly formatted")
 }
 
 func TestInvalidPrefix(t *testing.T) {
@@ -56,7 +55,7 @@ func TestInvalidPrefix(t *testing.T) {
 
   hashes, err := DecodeHashes(buf)
   assert.Nil(t, hashes)
-  assert.EqualError(t, err, "error decoding line 1: invalid prefix \"x\"")
+  assert.EqualError(t, err, "invalid prefix \"x\" on line 1")
 }
 
 func TestInvalidHash(t *testing.T) {

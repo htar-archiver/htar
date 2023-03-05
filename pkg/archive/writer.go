@@ -18,7 +18,7 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
   tw := tar.NewWriter(writer)
 	defer tw.Close()
 
-  hashes := make(map[string][]byte, part.TotalFiles)
+  hashes := make(Hashes, part.TotalFiles)
   totalSize := part.TotalSize
   writtenFiles := int(0)
   writtenBytes := int64(0)
@@ -41,6 +41,7 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
       if progress != nil {
         progress <- ProgressUpdate{
           Path: file.Path,
+          Hash: hash,
           FileSize: file.Size,
           FileChangedSize: changed,
           CurrentFiles: writtenFiles,
@@ -52,7 +53,11 @@ func WritePartition(fsys fs.FS, part Partition, writer io.Writer, progress chan<
     }
   }
 
-  buf := hashesFile(hashes) 
+  buf := new(bytes.Buffer)
+  if err := EncodeHashes(hashes, buf); err != nil {
+    return fmt.Errorf("error creating checksum file %v: ", err)
+  }
+
   if _, _, err := writeBuffer(tw, buf, "SHA256SUMS"); err != nil {
     return fmt.Errorf("error writing checksum file %v: ", err)
   }
@@ -97,15 +102,6 @@ func writeFile(tw *tar.Writer, fsys fs.FS, path string) (int64, []byte, error) {
   }
 
   return written, sha.Sum(nil), nil
-}
-
-func hashesFile(hashes map[string][]byte) *bytes.Buffer {
-  buf := new(bytes.Buffer)
-  for path, hash := range hashes {
-    line := fmt.Sprintf("%x  %v\n", hash, path);
-    buf.WriteString(line)
-  }
-  return buf
 }
 
 func writeBuffer(tw *tar.Writer, content *bytes.Buffer, path string) (int64, []byte, error) {

@@ -4,7 +4,9 @@ import(
   "archive/tar"
   "bytes"
   "crypto/sha256"
+  "fmt"
   "io"
+  "strings"
 )
 
 func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
@@ -39,10 +41,12 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
 
       read, hash, err := readFile(tr, buf)
       if err != nil {
-        return err
+        return fmt.Errorf("error reading file %q from archive: %v", header.Name, err)
       }
 
-      hashes[header.Name] = hash
+      if header.Name != "SHA256SUMS" {
+        hashes[header.Name] = hash
+      }
 
       readFiles += 1
       readBytes += read
@@ -50,12 +54,24 @@ func VerifyPartition(reader io.Reader, progress chan<- ProgressUpdate) error {
       if progress != nil {
         progress <- ProgressUpdate{
           Path: header.Name,
+          Hash: hash,
           FileSize: read,
           CurrentFiles: readFiles,
           CurrentSize: readBytes,
         }
       }
     }
+  }
+
+  expected, err := DecodeHashes(hashesFile)
+  if err != nil {
+    return fmt.Errorf("error parsing checksum file: %v", err)
+  }
+
+  diff := CompareHashes(hashes, expected)
+
+  if diff != nil {
+    return fmt.Errorf("%d computed checksum did NOT match:\n%v", len(diff), strings.Join(diff, "\n"))
   }
 
   return nil
@@ -78,4 +94,3 @@ func readFile(tr *tar.Reader, content *bytes.Buffer) (int64, []byte, error) {
 
   return read, sha.Sum(nil), nil
 }
-

@@ -45,7 +45,7 @@ func DecodeHashes(reader io.Reader) (Hashes, error) {
     parts := strings.SplitN(string(line), " ", 2)
 
     if len(parts) != 2 || len(parts[1]) < 2 {
-      return nil, fmt.Errorf("error decoding line %d", ln)
+      return nil, fmt.Errorf("line %d improperly formatted", ln)
     }
 
     hash, err := hex.DecodeString(parts[0])
@@ -54,7 +54,7 @@ func DecodeHashes(reader io.Reader) (Hashes, error) {
     }
 
     if prefix := parts[1][:1]; prefix != " " && prefix != "*" {
-      return nil, fmt.Errorf("error decoding line %d: invalid prefix %q", ln, prefix)
+      return nil, fmt.Errorf("invalid prefix %q on line %d", prefix, ln)
     }
 
     // trim first character ' ' or '*' 
